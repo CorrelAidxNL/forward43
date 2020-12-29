@@ -11,22 +11,27 @@ import pandas as pd
 import requests
 
 # %%   Set variables
-criteria = ['id', 'name', 'description', 'status', 'type', 'country', 'location', 'absolute_url']
+URL = 'https://api.ulule.com/v1/'
+ENDPOINT_PROJECTS = 'search/projects/'
+QUERY = ['status:currently']  
+CRITERIA = ['id', 'name', 'description', 'status', 'type', 'country', 'location', 'absolute_url']
 
-# - id.
+# - id
 # Title - name
 # Description - description
-# Status - status.
-# Innovation type - type (1, 2).
-# Country - country (as two-letter ISO code).
+# Status - status
+# Innovation type - type
+# Country - country
 # City - location
-# Link - absolute_url.
+# Link - absolute_url
 
 # The description and name are only available if you get the project on ID. 
 # You also have to know the language you want the description in because the fields
 # have the country code appended to it, eg. decription_de, description_en.
 
 # Type: 1 (presale) or 2 (project)
+
+# Country is given as a two-letter ISO code
 
 # %%   Functions
 def get_object(url):
@@ -47,18 +52,17 @@ def get_page(url, query, limit, page=1):
     return response
 
 
+def write_to_file(projects, file_name):
+    """ Write a list of projects to file. """
+    project_df = pd.DataFrame(projects)
+    project_df.to_csv(f'{file_name}.csv', index=False)
+    
+    print(f'Wrote to file: {file_name}.csv')
+
+
 def main():
-    pass
-
-
-# %%   If-Main
-if __name__ == '__main__':
-    # main()
-    url = 'https://api.ulule.com/v1/'
-    endpoint_projects = 'search/projects/'
-    query = ['status:currently']
-
-    response = get_page(url + endpoint_projects, query, limit=1, page=0)
+    # Get initial response to assess number of projects
+    response = get_page(URL + ENDPOINT_PROJECTS, QUERY, limit=0)
 
     data = response.json()
     meta = data['meta']
@@ -66,26 +70,32 @@ if __name__ == '__main__':
     limit = meta['limit']
     n_pages = math.ceil(n_projects / limit)
     
-    # %%   Get list of IDs
+    #   Get list of IDs
     id_list = []
     for n in range(n_pages):
-        page = get_page(url + endpoint_projects, query, limit, page=n).json()
+        page = get_page(URL + ENDPOINT_PROJECTS, QUERY, limit, page=n).json()
         projects = page['projects']
         for p in projects:
             id_list.append(p['id'])
     
-    # %%   Get projects
+    #   Get projects
     project_list = []
-    for project_id in id_list[:5]:
-        project = get_object(url + f'projects/{project_id}').json()
-        project = {k: project[k] for c in criteria for k in project.keys() 
-                   if k.startswith(c) and len(k) < 15}     # For now: keep all description and name fields
+    for project_id in id_list:
+        project = get_object(URL + f'projects/{project_id}').json()
+        project = {k: project[k] for c in CRITERIA for k in project.keys() 
+                   if k.startswith(c) and len(k) < 15}                          # There are multiple 'description_x' fields; this selects only the desired one
         project['location'] = project['location']['city']
         project_list.append(project)
         
+    return project_list
+        
     
-    # %%   Write to file
-    project_df = pd.DataFrame(project_list)
-    project_df.to_csv('projects_ulule.csv', index=False)
+    # #   Write to file
+    # write_to_file(project_list, file_name='projects_ulule')
+
+
+# %%   If-Main
+if __name__ == '__main__':
+    projects = main()
     
 
