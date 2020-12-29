@@ -6,9 +6,12 @@ Created on Wed Dec 16 22:06:55 2020
 @author: Marijke Thijssen
 """
 # %%   Import packages
+import json
 import math
 import pandas as pd
 import requests
+
+from support import timer
 
 # %%   Set variables
 URL = 'https://api.ulule.com/v1/'
@@ -34,6 +37,7 @@ CRITERIA = ['id', 'name', 'description', 'status', 'type', 'country', 'location'
 # Country is given as a two-letter ISO code
 
 # %%   Functions
+@timer
 def get_object(url):
     """ Retrieve a response. """
     response = requests.get(url)
@@ -43,6 +47,7 @@ def get_object(url):
     return response
 
 
+@timer
 def get_page(url, query, limit, page=1):
     """ Retrieve a paginated response. """
     response = requests.get(url, params={'q': '+'.join(query), 'offset': page * limit})
@@ -54,12 +59,16 @@ def get_page(url, query, limit, page=1):
 
 def write_to_file(projects, file_name):
     """ Write a list of projects to file. """
-    project_df = pd.DataFrame(projects)
-    project_df.to_csv(f'{file_name}.csv', index=False)
+    # project_df = pd.DataFrame(projects)
+    # project_df.to_csv(f'{file_name}.csv', index=False)
     
-    print(f'Wrote to file: {file_name}.csv')
+    with open(f'{file_name}.json', 'w', encoding='utf-8') as dest:
+        json.dump(projects, dest, ensure_ascii=False, indent=4)
+    
+    print(f'Wrote data to file: {file_name}.csv')
 
 
+@timer
 def main():
     # Get initial response to assess number of projects
     response = get_page(URL + ENDPOINT_PROJECTS, QUERY, limit=0)
@@ -78,7 +87,7 @@ def main():
         for p in projects:
             id_list.append(p['id'])
     
-    #   Get projects
+    #   Get projects with criteria
     project_list = []
     for project_id in id_list:
         project = get_object(URL + f'projects/{project_id}').json()
@@ -87,7 +96,7 @@ def main():
         project['location'] = project['location']['city']
         project_list.append(project)
         
-    return project_list
+    return json.dumps(project_list)
         
     
     # #   Write to file
