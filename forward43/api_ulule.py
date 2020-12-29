@@ -6,23 +6,45 @@ Created on Wed Dec 16 22:06:55 2020
 @author: Marijke Thijssen
 """
 # %%   Import packages
+import math
+import pandas as pd
 import requests
 
 # %%   Set variables
 criteria = ['id', 'name', 'description', 'status', 'type', 'country', 'location', 'absolute_url']
 
-# - id
+# - id.
 # Title - name
 # Description - description
-# Status - status
-# Innovation type - type
-# Country - country (as two-letter ISO code)
+# Status - status.
+# Innovation type - type (1, 2).
+# Country - country (as two-letter ISO code).
 # City - location
-# Link - absolute_url
+# Link - absolute_url.
 
+# The description and name are only available if you get the project on ID. 
+# You also have to know the language you want the description in because the fields
+# have the country code appended to it, eg. decription_de, description_en.
+
+# Type: 1 (presale) or 2 (project)
 
 # %%   Functions
+def get_object(url):
+    """ Retrieve a response. """
+    response = requests.get(url)
+    if response.status_code != 200:
+        raise Exception(f'Unsuccessful GET on {url}: {response.status_code}')
+    
+    return response
 
+
+def get_page(url, query, limit, page=1):
+    """ Retrieve a paginated response. """
+    response = requests.get(url, params={'q': '+'.join(query), 'offset': page * limit})
+    if response.status_code != 200:
+        raise Exception(f'Unsuccessful GET on {url}: {response.status_code}')
+    
+    return response
 
 
 def main():
@@ -33,16 +55,37 @@ def main():
 if __name__ == '__main__':
     # main()
     url = 'https://api.ulule.com/v1/'
-    projects = 'search/projects/'
-    query = 'status=all'
+    endpoint_projects = 'search/projects/'
+    query = ['status:currently']
 
-    response = requests.get(url + projects, params={'q': query})
-    if response.status_code != 200:
-        raise Exception('GET {}'.format(response.status_code))
-    # PAY ATTENTION: The response is paginated
+    response = get_page(url + endpoint_projects, query, limit=1, page=0)
 
     data = response.json()
-
-    # TODO: keep only criteria fields
-    # TODO: save to file
+    meta = data['meta']
+    n_projects = meta['total_count']
+    limit = meta['limit']
+    n_pages = math.ceil(n_projects / limit)
+    
+    # %%   Get list of IDs
+    id_list = []
+    for n in range(n_pages):
+        page = get_page(url + endpoint_projects, query, limit, page=n).json()
+        projects = page['projects']
+        for p in projects:
+            id_list.append(p['id'])
+    
+    # %%   Get projects
+    project_list = []
+    for project_id in id_list[:5]:
+        project = get_object(url + f'projects/{project_id}').json()
+        project = {k: project[k] for c in criteria for k in project.keys() 
+                   if k.startswith(c) and len(k) < 15}     # For now: keep all description and name fields
+        project['location'] = project['location']['city']
+        project_list.append(project)
+        
+    
+    # %%   Write to file
+    project_df = pd.DataFrame(project_list)
+    project_df.to_csv('projects_ulule.csv', index=False)
+    
 
