@@ -4,10 +4,14 @@ import json
 import random
 import time
 import requests
-from pathlib import Path
+from pathlib        import Path
 
 from datetime       import datetime
 from urllib.request import urlopen
+
+from fp.fp          import FreeProxy
+
+from spoof_params   import user_agent_list, accept_list
 
 
 MAX_VALUE                  = 65536
@@ -37,11 +41,22 @@ def generate_url(category, page):
     get_params  = KICKSTARTER_DEFAULT_PARAMS + ['category_id={}'.format(category), 'page={}'.format(str(page)), random_seed, random_woe_id]
     return KICKSTARTER_URL + '&'.join(get_params)
 
-def fetch_data(url):
+def fetch_data(url, proxies):
 
     try:
-        r = requests.get(url)
+        user_agent_ = random.choice(user_agent_list)
+        accept_     = random.choice(accept_list)
+        headers_    = {
+            'User-Agent': user_agent_,
+            'Accept': accept_,
+            'Accept-Language': 'en-US,en;q=0.5',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+        }
 
+        r = requests.get(url, headers=headers_, proxies=proxies)
+        print(r.json()['origin'])
         if r.status_code != 200:
             print('*** http error ***')
             return ''
@@ -76,29 +91,44 @@ def fetch_data(url):
     except Exception as e:
         print(e)
 
-def main(category, page):
+def main(category, page, proxy):
 
-    url  = generate_url(category, page)
-    data = fetch_data(url)
+    url   = generate_url(category, page)
+    data  = fetch_data(url, proxy)
 
     print('    URL: {}'.format(url))
 
     return data
 
+def get_proxy():
+    proxy = FreeProxy().get()
+    print(proxy)
+
+    if proxy.startswith('https'):
+        type = 'https'
+    else:
+        type = 'http'
+    proxy = {
+        type : proxy
+    }
+
+    return proxy
+
 
 if __name__ == '__main__':
 
     category_ids = [3, 272, 1]
-    num_pages    = 5  # 12 entries per page
+    num_pages    = 12  # 12 entries per page
 
     for category in category_ids:
 
         print('Category: {}'.format(category))
-        data = []
+        data  = []
+        proxy = get_proxy()
 
         for page in range(1, num_pages + 1):
             print('    Page: {}'.format(page))
 
-            data += (main(category, page))
+            data += (main(category, page, proxy))
 
         write_data_to_file(data, category)
