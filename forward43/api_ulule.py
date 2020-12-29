@@ -8,7 +8,7 @@ Created on Wed Dec 16 22:06:55 2020
 # %%   Import packages
 import json
 import math
-import pandas as pd
+# import pandas as pd
 import requests
 
 from support import timer
