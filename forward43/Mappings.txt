@@ -1,0 +1,35 @@
+#This file is the mapping file for the Indices we create in Elastic Search.
+
+#1. Create a Index with required number of shards and replicas.
+#2. create the mapping file for the above created Index,
+#3. Add documents into the index.
+
+#creating the index
+PUT /forward43	
+{
+	"settings": {
+		"number_of_shards" : x,   # x is the number of shards
+		"number_of_replicas" : y  # y is the number of replicas
+	}
+}
+
+
+
+#Mapping the index
+PUT /forward43			
+{
+  "mappings": {
+    "properties": {
+      "title": {"type": "text"},
+      "description": {"type": "text"},
+      "status": {"type": "text"},
+      "innovation_type": {"type": "text"},
+      "country": {"type": "keyword"},
+      "city": {"type": "keyword"},
+      "contactPerson.name": {"type": "text"},
+      "cotactPerson.email": {"type": "keyword"},
+      "contactPerson.number": {"type": "long"},
+      "link": {"type": "keyword"}
+    }
+  }
+}
