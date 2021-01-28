@@ -7,7 +7,7 @@ PROJECT_URL_BASE        = 'https://startsomegood.com'
 BROWSE_URL_BASE         = 'https://startsomegood.com/projects?page='
 
 
-def scrape_some_good(n_pages = 15):
+def good_scraper(n_pages = 15):
 
     # create url's for ... overview pages
     browse_pages = []
