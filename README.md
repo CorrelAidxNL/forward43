@@ -1,4 +1,5 @@
 
+
 # Forward43 by MasterPeace in collaboration with CorrelAid
 
 **Forward43** is a data-driven project with the dream of supporting innovations worldwide by connecting them to decision-makers. We aim to create a match-making mechanism for decision-makers to better define their problems and connect them to ‘best-fit’ innovations through using semantic match-making, machine learning modules, and purposeful Artificial Intelligence.
@@ -18,7 +19,7 @@ We value open knowledge management and transparency in our work wherever possibl
 
 ----------
 
-##Project aim
+## Project aim
 
 Leading up to Forward43, MasterPeace found that their own database and the data available at other humanitarian, philatropic and entrepreneurial platforms offer relevant and in depth information on social innovations, which is often more valueble than the information found through conventional search engines (e.g. Google, Bing, Yahoo). Moreover, the teams involved became enthusiastic about gaining better insight into the landscape of social innovations. An overview of past and present projects enables social entrepreneurs to connect with like-minded people, build networks and learn from each other's experiences. Thus, in Forward43, we construct a search engine that enables MasterPeace chapters around the world to easily find and contact organisations and/or projects that have similar aims, operate in the same area, or have other relevant experience. 
 
@@ -30,10 +31,44 @@ Leading up to Forward43, MasterPeace found that their own database and the data 
 
 In order to build the search engine, we have created a pipeline to
 
- 1.  Scrape data from various sources (Python)
+ 1.  Scrape social innovation data (Python)
  2. Automate periodic scraping (Docker)
  3. Collect the data in a database (Elasticsearch)
  4. Acces/search the database through dashboard/front end (Elasticsearch/...)
 
----
 
+#### 1. Scrape social innovation data (Python) 
+We collect data on social innovations and projects by scraping croudfunding and fundraising websites. Currently, we focus on the following sites:
+
+- kickstarter.com
+- ulule.com
+- startsomegood.com
+- justgiving.com (scraper upcoming)
+
+On these sites, we collect the following information on projects:
+
+- Title  
+- Description  
+- Status
+- Innovation type (company, project)
+- Country
+- City
+- Contact person/details
+- Link
+ 
+The data scraped is stored in JSON format so that it can be stored easily in the Elasticsearsch database (see step 3).
+
+
+####  2. Automate periodic scraping (Docker)
+
+To continuously serve its users and display the latest innovations, the engine should be regularly updated. We choose to automate this process with Docker.
+
+#### 3. Collect the data in a database (Elasticsearch)
+
+We use Elasticsearch to store and access the data. Elasticsearch is a distributed, free and open search and analytics engine for all types of data, stored in JSON format.
+
+#### 4. Acces/search the database through dashboard/front end (Elasticsearch/...)
+
+Elastisearch offers a data visualization and management tool for programmers called Kibana. However, since various users, non-programmers included, should be able to work with our search engine, we will build a more accessible user interface.
+
+---
