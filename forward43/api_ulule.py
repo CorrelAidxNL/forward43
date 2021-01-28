@@ -17,7 +17,7 @@ from support import timer
 URL = 'https://api.ulule.com/v1/'
 ENDPOINT_PROJECTS = 'search/projects/'
 QUERY = ['status:currently']  
-CRITERIA = ['id', 'name', 'description', 'status', 'type', 'country', 'location', 'absolute_url']
+CRITERIA = ['id', 'name_en', 'description_en', 'status', 'type', 'country', 'location', 'absolute_url']
 
 # - id
 # Title - name
@@ -37,7 +37,7 @@ CRITERIA = ['id', 'name', 'description', 'status', 'type', 'country', 'location'
 # Country is given as a two-letter ISO code
 
 # %%   Functions
-@timer
+# @timer
 def get_object(url):
     """ Retrieve a response. """
     response = requests.get(url)
@@ -47,7 +47,7 @@ def get_object(url):
     return response
 
 
-@timer
+# @timer
 def get_page(url, query, limit, page=1):
     """ Retrieve a paginated response. """
     response = requests.get(url, params={'q': '+'.join(query), 'offset': page * limit})
@@ -92,9 +92,17 @@ def main():
     for project_id in id_list:
         project = get_object(URL + f'projects/{project_id}').json()
         project = {k: project[k] for c in CRITERIA for k in project.keys() 
-                   if k.startswith(c) and len(k) < 15}                          # There are multiple 'description_x' fields; this selects only the desired one
-        project['location'] = project['location']['city']
-        project_list.append(project)
+                   if k == c}
+        details = {
+            'id': project.get('id', 'no ID given'),
+            'title': project.get('name_en', 'no English title given'),
+            'description': project.get('description_en', 'no English description given'),
+            'status': project.get('status', 'no status given'),
+            'innovation_type': project.get('type', 'no type given'),
+            'country': project.get('country', 'no country given'),
+            'city': project.get('city', 'no location given'),
+            'link': project.get('absolute_url', 'no link given')}
+        project_list.append(details)
         
     return json.dumps(project_list)
         
@@ -106,5 +114,4 @@ def main():
 # %%   If-Main
 if __name__ == '__main__':
     projects = main()
-    
 
