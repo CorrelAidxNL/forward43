@@ -13,7 +13,7 @@ from urllib.request import urlopen
 MAX_VALUE                  = 65536
 KICKSTARTER_URL            = 'https://www.kickstarter.com/discover/advanced.json?'
 KICKSTARTER_DEFAULT_PARAMS = ['sort=newest', 'woe_id=1']
-ATTRIBUTES                 = ['rank', 'name', 'creator', 'goal', 'pledged', 'state', 'backers', 'launch_date', 'deadline', 'url']
+ATTRIBUTES                 = ['name', 'creator', 'goal', 'pledged', 'state', 'backers', 'launch_date', 'deadline', 'url']
 
 
 def write_data_to_file(data, category):
