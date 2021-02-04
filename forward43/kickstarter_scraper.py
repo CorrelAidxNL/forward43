@@ -12,15 +12,15 @@ from urllib.request import urlopen
 
 MAX_VALUE                  = 65536
 KICKSTARTER_URL            = 'https://www.kickstarter.com/discover/advanced.json?'
-KICKSTARTER_DEFAULT_PARAMS = ['sort=popularity']
-ATTRIBUTES                 = ['rank', 'id', 'name', 'creator', 'goal', 'pledged',
-                              'state', 'backers', 'launch_date', 'deadline', 'url']
+KICKSTARTER_DEFAULT_PARAMS = ['sort=newest', 'woe_id=1']
+ATTRIBUTES                 = ['rank', 'name', 'creator', 'goal', 'pledged', 'state', 'backers', 'launch_date', 'deadline', 'url']
+
 
 def write_data_to_file(data, category):
     '''
     Write json data to file
-    @data: dictionary
-    @category: category id
+    @data     : dictionary
+    @category : category id
     '''
     filepath = '../data/{}.json'.format(category)
 
@@ -31,19 +31,23 @@ def write_data_to_file(data, category):
 def generate_url(category, page):
     '''
     Generates a URL to scrape from. It's necessary that category and page parameters are not None
+    Args:
+        @category : category id
+        @page     : page number
     '''
-    random_seed   = 'seed='   + str(random.randint(1, MAX_VALUE))
-    random_woe_id = 'woe_id=' + str(random.randint(1, MAX_VALUE))
-    get_params  = KICKSTARTER_DEFAULT_PARAMS + ['category_id={}'.format(category), 'page={}'.format(str(page)), random_seed, random_woe_id]
+    random_seed = 'seed=' + str(random.randint(1, MAX_VALUE))
+    get_params  = KICKSTARTER_DEFAULT_PARAMS + [f"category_id={category}", f"page={page}", random_seed]
     return KICKSTARTER_URL + '&'.join(get_params)
 
 def fetch_data(url):
-
+    '''
+    Scrape kickstarter based on the url. Returns a list of dicts, where each dict is a project
+    '''
     try:
         r = requests.get(url)
 
         if r.status_code != 200:
-            print('*** http error ***')
+            print(f'Http error,: {str(r.status_code)}')
             return ''
 
         data         = r.json()
@@ -52,22 +56,18 @@ def fetch_data(url):
 
         for i in range(num_projects):
 
-            # TODO: This should be handled better
-            # TODO: Move this code
-            # TODO: It should be able to handle other scenarios
-            details = {
-                'id'          : str(data['projects'][i]['id']),
-                'rank'        : str(i + 1),
-                'name'        : data['projects'][i]['name'],
-                'creator'     : data['projects'][i]['creator']['name'],
-                'goal'        : str(data['projects'][i]['goal']),
-                'pledged'     : str(data['projects'][i]['pledged']),
-                'state'       : data['projects'][i]['state'],
-                'backers'     : str(data['projects'][i]['backers_count']),
-                'launch_date' : time.strftime('%c', time.localtime(data['projects'][i]['launched_at'])),
-                'deadline'    : time.strftime('%c', time.localtime(data['projects'][i]['deadline'])),
-                'url'         : data['projects'][i]['urls']['web']['project'],
-            }
+            details = { 'rank' : str(i + 1) }
+
+            for att in ATTRIBUTES:
+                details[att] = data['projects'][i].get(att, 'n.a.')
+
+            if details['creator'] != 'n.a.':
+                details['creator'] = details['creator'].get('name', 'n.a.')
+
+            try:
+                details['urls'] = details['urls']['web']['project']
+            except:
+                details['urls'] = 'n.a.'
 
             return_data.append(details)
 
@@ -76,13 +76,19 @@ def fetch_data(url):
     except Exception as e:
         print(e)
 
+
 def main(category, page):
-
-    url  = generate_url(category, page)
+    '''
+    Fetch kickstarter projects for a given category and page
+    Args:
+        @category : category id
+        @page     : page number
+    Return:
+        data (list of dicts)
+    '''
+    url  = generate_url(str(category), str(page))
     data = fetch_data(url)
-
     print('    URL: {}'.format(url))
-
     return data
 
 
