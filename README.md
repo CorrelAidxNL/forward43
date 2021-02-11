@@ -6,7 +6,7 @@
 
 The project aims to utilize vast data regarding innovations and find a smart framework to solve the world's most pressing issues facing societies, governments, organizations or businesses with current existing solutions.
 
-**MasterPeace** is a grassroots peace-building organization that believes that the world is “7 billion talents, not issues” Therefore, we, in MasterPeace, use the soft-power of music, art, sports and play to mobilize and inspire young people.  We believe that there is more that we have in common than what separates us.
+**MasterPeace** is a grassroots peace-building organization that believes that the world is “7 billion talents, not issues”. Therefore, we, in MasterPeace, use the soft-power of music, art, sports and play to mobilize and inspire young people.  We believe that there is more that we have in common than what separates us.
 
 Therefore, we organize Dialogues within and between communities and stakeholders. We believe that the lack of perspective triggers polarization, extremism, and conflict. Therefore, we create perspective through capacity-building and leadership training for young people.
 
@@ -21,7 +21,7 @@ We value open knowledge management and transparency in our work wherever possibl
 
 ## Project aim
 
-Leading up to Forward43, MasterPeace found that their own database and the data available at other humanitarian, philatropic and entrepreneurial platforms offer relevant and in depth information on social innovations, which is often more valueble than the information found through conventional search engines (e.g. Google, Bing, Yahoo). Moreover, the teams involved became enthusiastic about gaining better insight into the landscape of social innovations. An overview of past and present projects enables social entrepreneurs to connect with like-minded people, build networks and learn from each other's experiences. Thus, in Forward43, we construct a search engine that enables MasterPeace chapters around the world to easily find and contact organisations and/or projects that have similar aims, operate in the same area, or have other relevant experience. 
+Leading up to Forward43, MasterPeace found that their own database and the data available at other humanitarian, philatropic and entrepreneurial platforms offer relevant and in depth information on social innovations, which is often more valuable than the information found through conventional search engines (e.g. Google, Bing, Yahoo). Moreover, the teams involved became enthusiastic about gaining better insight into the landscape of social innovations. An overview of past and present projects enables social entrepreneurs to connect with like-minded people, build networks and learn from each other's experiences. Thus, in Forward43, we construct a search engine that enables MasterPeace chapters around the world to easily find and contact organisations and/or projects that have similar aims, operate in the same area, or have other relevant experience. 
 
 ---
 
@@ -34,11 +34,11 @@ In order to build the search engine, we have created a pipeline to
  1.  Scrape social innovation data (Python)
  2. Automate periodic scraping (Docker)
  3. Collect the data in a database (Elasticsearch)
- 4. Acces/search the database through dashboard/front end (Elasticsearch/...)
+ 4. Access/search the database through dashboard/front end (Elasticsearch/...)
 
 
 #### 1. Scrape social innovation data (Python) 
-We collect data on social innovations and projects by scraping croudfunding and fundraising websites. Currently, we focus on the following sites:
+We collect data on social innovations and projects by scraping crowdfunding and fundraising websites. Currently, we focus on the following sites:
 
 - kickstarter.com
 - ulule.com
