@@ -1,0 +1,11 @@
+.editorconfig
+.git
+.gitignore
+.travis.yml
+AUTHORS.rst
+CONTRIBUTING.rst
+LICENSE
+MANIFEST.in
+README.md
+Dockerfile*
+docker-compose*
