@@ -3,11 +3,11 @@
 This module sets up a connection to Elasticsearch and enables interaction.
 
 Created on Tue Dec 29 16:39:25 2020
-@author: Marijke Thijssen
 """
 # %%   Import packages
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, helpers
 import json
+import uuid
 
 
 # %%   Functions
@@ -23,7 +23,7 @@ def connect_elasticsearch(host='localhost', port=9200):
     return es
 
 
-def create_index(es_object, index_name, mapping=None, n_shards=1, n_replicas=0):
+def create_index(es_object, index_name, mappings=None, n_shards=1, n_replicas=0):
     """ Create an index if it does not exists yet. """
     is_created = False
 
@@ -31,8 +31,8 @@ def create_index(es_object, index_name, mapping=None, n_shards=1, n_replicas=0):
         'settings': {
             'number_of_shards': n_shards,
             'number_of_replicas': n_replicas
-            },
-        'mappings': mapping
+        },
+        'mappings': mappings
     }
     
     try:
@@ -62,9 +62,6 @@ def search(es_object, index, search_params):
     result = es_object.search(index=index, body=json_search)
     
     return result
-    # Possibilities for search operators include: match, bool (must, should, 
-    # must_not), filter, match_phrase
-
 
 
 def get_document(es_object, index, doc_type, es_id):
@@ -73,4 +70,12 @@ def get_document(es_object, index, doc_type, es_id):
     
     return result
 
-# Also possible: bulk, count, create, put_script, update, and more
+
+def bulk_ingest(es_object, actions, **kwargs):
+    """ Bulk ingest """
+    try:
+        response = helpers.bulk(es_object, actions, **kwargs)
+    except Exception as e:
+        print(f'Failed to complete a bulk action: {e}')
+    
+    return response
