@@ -1,5 +1,7 @@
 FROM python:3.9-slim-buster
 
+EXPOSE 8080
+
 COPY requirements_dev.txt ./requirements_dev.txt
 RUN pip install -r /requirements_dev.txt
 
