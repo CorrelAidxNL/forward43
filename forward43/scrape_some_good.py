@@ -1,7 +1,9 @@
 import json
 import requests
+from collections import defaultdict
 from bs4 import BeautifulSoup
 import pandas as pd
+
 
 PROJECT_URL_BASE        = 'https://startsomegood.com'
 BROWSE_URL_BASE         = 'https://startsomegood.com/projects?page='
@@ -63,6 +65,10 @@ def good_scraper(n_pages = 15):
 
     good_data_df = pd.DataFrame.from_records(good_data)
     return good_data_df
+
+
+if __name__ == '__main__':
+    good_scraper(n_pages=15)
 
 
 # export df to JSON
