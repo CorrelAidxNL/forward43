@@ -3,6 +3,7 @@
 This module sets up a connection to Elasticsearch and enables interaction.
 
 Created on Tue Dec 29 16:39:25 2020
+@author: Marijke Thijssen
 """
 # %%   Import packages
 from elasticsearch import Elasticsearch, helpers

@@ -8,7 +8,7 @@ def bulk_json_data(index, json_list):
     for doc in json_list:
         yield {
             '_index'  : index,
-            '_id'     : uuid.uuid4(),
+            '_id'     : uuid.uuid4(),  # FIXME: ID should not be random to avoid duplicate entries
             '_source' : doc
         }
 

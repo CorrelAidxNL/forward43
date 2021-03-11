@@ -7,6 +7,7 @@ import utils_elasticsearch as utils
 
 def create_index_with_mapping(es):
 
+    # FIXME: The mappings should be retrieved from the mappings PR
     mappings = {
         "properties": {
             "name": {
@@ -35,6 +36,9 @@ def create_index_with_mapping(es):
 
 def read_json_data(es):
 
+    # FIXME: This assumes that data is stored in ../data folder. Only kickstarter_scraper does this.
+    #        1. Do the same for the other scrapers
+    #        2. Add a path argument
     data_path_common = '../data/'
 
     for _file in os.listdir(data_path_common):
@@ -55,6 +59,9 @@ def read_json_data(es):
 
 def read_csv_file(es):
 
+    # FIXME: This assumes that data is stored in ../data folder. Only kickstarter_scraper does this.
+    #        1. Do the same for the other scrapers
+    #        2. Add a path argument
     data_path_common = '../data/'
 
     for _file in os.listdir(data_path_common):
@@ -70,7 +77,6 @@ def read_csv_file(es):
                         'pledged' : df.loc[i, 'pledged'],
                         'state'   : df.loc[i, 'state']
                     }
-                    print(i)
 
                     utils.index_document(es, 'forward43', '_doc', d_smaller)
                 except:
@@ -79,22 +85,11 @@ def read_csv_file(es):
 
 if __name__ == '__main__':
 
+    # Get ES instance
     es = utils.connect_elasticsearch()
-
-    # create_index_with_mapping(es)
-
+    # Create a mapping if necessary
+    create_index_with_mapping(es)
+    # # Read data from json file
     # read_json_data(es)
-
-    read_csv_file(es)
-
-
-
-
-
-
-
-
-
-
-
-
+    # # Read data from csv file
+    # read_csv_file(es)
