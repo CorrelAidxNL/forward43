@@ -25,7 +25,8 @@ def get_data_from_json_file(filename):
     json_data = []
     for line in lines:
         temp_json = json.loads(line)['data']
-        
+
+        # FIXME: The mappings should be retrieved from the mappings PR.  
         json_data.append({
             'name'    : temp_json['name'],
             'state'   : temp_json['state'],
