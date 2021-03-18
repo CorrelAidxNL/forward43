@@ -30,36 +30,40 @@ def good_scraper(n_pages = 15):
         
             # loop over the tiles to find the data needed
             for project in projects:
-                # Get available data from project tile on overview page
-                title                   = project.find('h4').text
-                status                  = project.find('span', class_='pull-right closing-date').text
-                link                    = PROJECT_URL_BASE + project.get('href')
-            
-                # Scrape soup from project page
-                project_response        = requests.get(link, timeout = 5)
-                project_soup            = BeautifulSoup(project_response.content, "html.parser")
-            
-                # Get remaining data from project-page soup
-                row = defaultdict(lambda: 'n.a.') # if row[x] value is non existent, it returns n.a.
-            
-                story = project_soup.find('p', class_='story')
-                if story is not None:
-                    row['description']  = story.text
-                        
-                subtitle = project_soup.find("p", class_="sub-title")
-                if subtitle is not None:
-                    row['location']     = subtitle.text.strip()
-                    row['city']         = row['location'].split(',')[0]
-                    row['country']      = row['location']#.split(',')[1]
-                    row['contact']      = row['location']#.split(',')[1]
-                                                 # Note that country and contact are identical and messy
-            
-                category = project_soup.find('ul', class_="nav nav-pills categories")
-                if category is not None:
-                    row['innovation_type'] = category.text
-            
-                good_observation        = {"Title":[title], "Description":[description], "Status":[status], "innovation_type":[innovation_type], "Country":[country], "City":[city], "Contact person/details":[contact], "Link":[link]}
-                good_data.append(good_observation)
+                try:
+                    # Get available data from project tile on overview page
+                    title                   = project.find('h4').text
+                    status                  = project.find('span', class_='pull-right closing-date').text
+                    link                    = PROJECT_URL_BASE + project.get('href')
+                    
+                    # Scrape soup from project page
+                    project_response        = requests.get(link, timeout = 5)
+                    project_soup            = BeautifulSoup(project_response.content, "html.parser")
+                    
+                    # Get remaining data from project-page soup
+                    row = defaultdict(lambda: 'n.a.') # if row[x] value is non existent, it returns n.a.
+                    
+                    story = project_soup.find('p', class_='story')
+                    if story is not None:
+                        row['description']  = story.text
+                    	
+                    subtitle = project_soup.find("p", class_="sub-title")
+                    if subtitle is not None:
+                        row['location']     = subtitle.text.strip()
+                        row['city']         = row['location'].split(',')[0]
+                        row['country']      = row['location']#.split(',')[1]
+                        row['contact']      = row['location']#.split(',')[1]
+                                                # Note that country and contact are identical and messy
+                    
+                    category = project_soup.find('ul', class_="nav nav-pills categories")
+                    if category is not None:
+                        row['innovation_type'] = category.text
+                    
+                    good_observation        = {"Title":[title], "Description":row['description'], "Status":[status],
+                    "innovation_type":row['innovation_type'], "Country":row['country'], "City":row['city'], "Contact person/details":row['contact'], "Link":row['link']}
+                    good_data.append(good_observation)
+                except:
+                    pass
         except:
             pass
 
