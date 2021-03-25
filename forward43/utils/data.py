@@ -1,14 +1,29 @@
 import os
 import json
-import uuid
 
 
-def bulk_json_data(index, json_list):
+def get_doc_id(document, source):
+    '''
+    For a given document from source dataset, generate a document id
+    @document : Doument object. There should be a project id associated with each document
+    @source   : Source dataset
+    '''
+    return source + '_' + document['id']
 
-    for doc in json_list:
+def bulk_json_data(index, data, source):
+    '''
+    Creates bulk actions from a list of json data
+    @index  : index name
+    @data   : list of json data
+    @source : source of the dataset (e.g., kickstarter, ulule, etc.)
+    '''
+    for doc in data:
+
+        _id = get_doc_id(doc, source)
+
         yield {
             '_index'  : index,
-            '_id'     : uuid.uuid4(),
+            '_id'     : _id,
             '_source' : doc
         }
 
