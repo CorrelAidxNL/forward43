@@ -2,7 +2,7 @@ import json
 import os
 import pandas as pd
 
-import utils_elasticsearch as utils
+import utils.elasticsearch as es_utils
 
 
 def create_index_with_mapping(es):
@@ -25,7 +25,7 @@ def create_index_with_mapping(es):
         }
     }
 
-    is_created = utils.create_index(
+    is_created = es_utils.create_index(
         es_object  = es, 
         index_name = 'forward43', 
         mappings   = mappings,
@@ -54,7 +54,7 @@ def read_json_data(es):
                     'pledged' : doc['pledged'],
                     'state'   : doc['state']
                 }
-                utils.index_document(es, 'forward43', '_doc', d_smaller)
+                es_utils.index_document(es, 'forward43', '_doc', d_smaller)
 
 
 def read_csv_file(es):
@@ -78,7 +78,7 @@ def read_csv_file(es):
                         'state'   : df.loc[i, 'state']
                     }
 
-                    utils.index_document(es, 'forward43', '_doc', d_smaller)
+                    es_utils.index_document(es, 'forward43', '_doc', d_smaller)
                 except:
                     pass
 
@@ -86,7 +86,7 @@ def read_csv_file(es):
 if __name__ == '__main__':
 
     # Get ES instance
-    es = utils.connect_elasticsearch()
+    es = es_utils.connect_elasticsearch()
     # Create a mapping if necessary
     create_index_with_mapping(es)
     # # Read data from json file
