@@ -58,7 +58,6 @@ class StartSomeGoodScraper(ForwardScraper):
 
     def scrape(self):
         ''' Main Scraper function '''
-
         for i in range(1, self.num_pages):
 
             try:
