@@ -60,11 +60,15 @@ class StartSomeGoodScraper(ForwardScraper):
         ''' Main Scraper function '''
 
         for i in range(1, self.num_pages):
-            url      = self.get_url(i)
-            response = self.get_response(url)
-            projects = self.process_response(response)
 
-            self.write_to_file(projects, str(i), self.which_scraper)
+            try:
+                url      = self.get_url(i)
+                response = self.get_response(url)
+                projects = self.process_response(response)
+
+                self.write_to_file(projects, str(i), self.which_scraper)
+            except Exception as e:
+                print(e)
 
 
 if __name__ == '__main__':

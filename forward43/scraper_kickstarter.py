@@ -55,11 +55,14 @@ class KickstarterScraper(ForwardScraper):
             for page in range(1, self.num_pages + 1):
                 print('    Page: {}'.format(page))
 
-                url       = self.get_url(category, page)
-                response  = self.get_response(url)
-                projects  = self.process_response(response)
+                try:
+                    url       = self.get_url(category, page)
+                    response  = self.get_response(url)
+                    projects  = self.process_response(response)
 
-                self.write_to_file(projects, str(category), self.which_scraper)
+                    self.write_to_file(projects, str(category), self.which_scraper)
+                except Exception as e:
+                    print(e)
 
 
 if __name__ == '__main__':

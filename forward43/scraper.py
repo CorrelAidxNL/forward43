@@ -3,6 +3,8 @@ import os
 import random
 import requests
 
+from fp.fp          import FreeProxy
+
 from hparams        import user_agent_list, accept_list
 from data.data_path import DATA_DIRECTORY
 
@@ -29,8 +31,6 @@ class ForwardScraper:
 
     def get_proxy(self):
         ''' Get a proxy for spoofing '''
-        from fp.fp import FreeProxy
-
         proxy    = FreeProxy().get()
         if proxy.startswith('https'):
             type = 'https'
@@ -45,6 +45,7 @@ class ForwardScraper:
         print(f'    url: {url}')
 
         if spoof:
+            proxies_    = self.get_proxy()
             user_agent_ = random.choice(user_agent_list)
             accept_     = random.choice(accept_list)
             headers_    = {
@@ -55,9 +56,6 @@ class ForwardScraper:
                 'Connection'                : 'keep-alive',
                 'Upgrade-Insecure-Requests' : '1',
             }
-            user_agent_ = random.choice(user_agent_list)
-            accept_     = random.choice(accept_list)
-            proxies_    = self.get_proxy()
 
             response    = requests.get(url, headers=headers_, proxies=proxies_)
         else:

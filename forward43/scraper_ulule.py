@@ -77,11 +77,14 @@ class UluleScraper(ForwardScraper):
         project_list  = []
         for project_id in id_list:
 
-            url       = self.get_url(project_id)
-            response  = self.get_response(url)
-            project   = self.process_response(response)
+            try:
+                url       = self.get_url(project_id)
+                response  = self.get_response(url)
+                project   = self.process_response(response)
 
-            project_list.append(project)
+                project_list.append(project)
+            except Exception as e:
+                print(e)
 
         self.write_to_file(projects, 'projects', self.which_scraper)
 
