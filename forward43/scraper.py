@@ -1,7 +1,9 @@
 import json
+import logging
 import os
 import random
 import requests
+import time
 
 from fp.fp          import FreeProxy
 
@@ -12,19 +14,28 @@ from data.data_path import DATA_DIRECTORY
 class ForwardScraper:
     ''' A common class for all the scrapers '''
 
-    def __init__(self):
+    def __init__(self, which_scraper):
         # NOTE: At a later point, fetch this from a constants file
-        self.attributes = ['id', 'title', 'description', 'status', 'innovation_type', 'country', 'city', 'link']
+        self.attributes    = ['id', 'title', 'description', 'status', 'innovation_type', 'country', 'city', 'link']
+        self.which_scraper = which_scraper
 
-    def write_to_file(self, projects, filename, which_scraper):
+        # Init logger
+        logging.basicConfig(
+            format   = '[%(asctime)s] %(levelname)-8s %(message)s',
+            filename = f'./logs/scraper_{which_scraper}-{int(time.time())}.log'
+        )
+        self.logger  = logging.getLogger('scraper')
+        self.logger.setLevel(logging.DEBUG)
+
+    def write_to_file(self, projects, filename):
         ''' Write a list of projects to file in the data directory '''
-        filepath = os.path.join(DATA_DIRECTORY, f'{which_scraper}-{filename}.json')
+        filepath = os.path.join(DATA_DIRECTORY, f'{self.which_scraper}-{filename}.json')
 
-        print(f'Writing to file: {filepath}')
+        self.logger.info(f'Writing to file: {filepath}')
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(projects, f, ensure_ascii=False, indent=4)
 
-        print(f'Data write completed')
+        self.logger.info('Data write completed')
 
     def get_url(self, *args, **kwargs):
         raise NotImplementedError()
@@ -42,7 +53,7 @@ class ForwardScraper:
 
     def get_response(self, url, spoof=False):
         ''' A wrapper over requests.get with/without spoofing '''
-        print(f'    url: {url}')
+        self.logger.info(f'Making a request to: {url}')
 
         if spoof:
             proxies_    = self.get_proxy()

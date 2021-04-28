@@ -6,12 +6,10 @@ from scraper import ForwardScraper
 class StartSomeGoodScraper(ForwardScraper):
 
     def __init__(self, num_pages):
-        ForwardScraper.__init__(self)
+        ForwardScraper.__init__(self, 'start_some_good')
 
-        self.which_scraper = 'start_some_good'
-        self.base_url      = 'https://startsomegood.com'
-
-        self.num_pages     = num_pages
+        self.base_url  = 'https://startsomegood.com'
+        self.num_pages = num_pages
 
     def get_url(self, page_num):
         '''
@@ -65,9 +63,9 @@ class StartSomeGoodScraper(ForwardScraper):
                 response = self.get_response(url)
                 projects = self.process_response(response)
 
-                self.write_to_file(projects, str(i), self.which_scraper)
+                self.write_to_file(projects, str(i))
             except Exception as e:
-                print(e)
+                self.logger.exception(f'Failed to get projects from page: {i}')
 
 
 if __name__ == '__main__':

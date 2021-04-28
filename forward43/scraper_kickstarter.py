@@ -6,9 +6,8 @@ from scraper import ForwardScraper
 class KickstarterScraper(ForwardScraper):
 
     def __init__(self, category_ids, num_pages):
-        ForwardScraper.__init__(self)
+        ForwardScraper.__init__(self, 'kickstarter')
 
-        self.which_scraper      = 'kickstarter'
         self.base_url           = 'https://www.kickstarter.com/discover/advanced.json?'
         self.default_url_params = ['sort=newest', 'woe_id=1']
 
@@ -49,20 +48,20 @@ class KickstarterScraper(ForwardScraper):
     def scrape(self):
         ''' Main Scraper function '''
         for category in self.category_ids:
-            print('Category: {}'.format(category))
             projects = []
 
             for page in range(1, self.num_pages + 1):
-                print('    Page: {}'.format(page))
+                self.logger.info(f'Processing category: {category} and page: {page}')
 
                 try:
                     url       = self.get_url(category, page)
                     response  = self.get_response(url)
                     projects  = self.process_response(response)
 
-                    self.write_to_file(projects, str(category), self.which_scraper)
                 except Exception as e:
-                    print(e)
+                    self.logger.exception('Failed to get projects from current page')
+
+            self.write_to_file(projects, str(category))
 
 
 if __name__ == '__main__':

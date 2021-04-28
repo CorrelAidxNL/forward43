@@ -7,12 +7,11 @@ from scraper import ForwardScraper
 class UluleScraper(ForwardScraper):
 
     def __init__(self):
-        ForwardScraper.__init__(self)
+        ForwardScraper.__init__(self, 'ulule')
 
-        self.which_scraper = 'ulule'
-        self.base_url      = 'https://api.ulule.com/v1/'
-        self.projects_ref  = 'search/projects/'
-        self.query         = ['status:currently']
+        self.base_url     = 'https://api.ulule.com/v1/'
+        self.projects_ref = 'search/projects/'
+        self.query        = ['status:currently']
 
     def _get_page(self, url, query, limit, page=1):
         ''' Retrieve a paginated response. '''
@@ -55,10 +54,13 @@ class UluleScraper(ForwardScraper):
         return details
 
     def scrape(self):
-        
-        # Get initial response to assess number of projects
-        page_response = self._get_page(self.base_url + self.projects_ref, query=self.query, limit=0)
-        
+        try:
+            # Get initial response to assess number of projects
+            page_response = self._get_page(self.base_url + self.projects_ref, query=self.query, limit=0)
+        except Exception as e:
+            self.logger.exception('Failed to fetch number of projeccts')
+            return
+
         data          = page_response.json()
         meta          = data['meta']
         n_projects    = meta['total_count']
@@ -68,10 +70,13 @@ class UluleScraper(ForwardScraper):
         # Get list of IDs
         id_list       = []
         for n in range(n_pages):
-            page      = self._get_page(self.base_url + self.projects_ref, query=self.query, limit=limit, page=n).json()
-            projects  = page['projects']
-            for p in projects:
-                id_list.append(p['id'])
+            try:
+                page      = self._get_page(self.base_url + self.projects_ref, query=self.query, limit=limit, page=n).json()
+                projects  = page['projects']
+                for p in projects:
+                    id_list.append(p['id'])
+            except Exception as e:
+                self.logger.exception(f'Failed to fetch project ids for page: {n}')
     
         # Get projects with criteria
         project_list  = []
@@ -84,9 +89,9 @@ class UluleScraper(ForwardScraper):
 
                 project_list.append(project)
             except Exception as e:
-                print(e)
+                self.logger.exception(f'Failed to fetch project details for project id: {project_id}')
 
-        self.write_to_file(projects, 'projects', self.which_scraper)
+        self.write_to_file(projects, 'projects')
 
 
 if __name__ == '__main__':
