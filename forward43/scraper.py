@@ -29,7 +29,7 @@ class ForwardScraper:
 
     def write_to_file(self, projects, filename):
         ''' Write a list of projects to file in the data directory '''
-        filepath = os.path.join(DATA_DIRECTORY, f'{self.which_scraper}-{filename}.json')
+        filepath = os.path.join(DATA_DIRECTORY, f'forward_scraper_{self.which_scraper}-{filename}.json')
 
         self.logger.info(f'Writing to file: {filepath}')
         with open(filepath, 'w', encoding='utf-8') as f:
