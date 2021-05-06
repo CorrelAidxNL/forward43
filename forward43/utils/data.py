@@ -11,8 +11,6 @@ def create_bulk_actions(index, data, source):
     '''
     for doc in data:
 
-        _id = get_doc_id(doc, source)
-
         yield {
             '_index'  : index,
             '_id'     : doc['id'],
