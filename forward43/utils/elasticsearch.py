@@ -24,7 +24,7 @@ def create_index(es_object, index_name, mappings=None, n_shards=1, n_replicas=0)
         },
         'mappings': mappings
     }
-    
+
     try:
         if not es_object.indices.exists(index_name):
             es_object.indices.create(index=index_name, ignore=400, body=settings)  # Ignore 400 "Index Already Exist" error
@@ -34,12 +34,12 @@ def create_index(es_object, index_name, mappings=None, n_shards=1, n_replicas=0)
         print(f'Failed to create index: {e}')
     finally:
         return is_created
-    
 
-def index_document(elastic_object, index, doc_type, document):
+
+def index_document(elastic_object, index, doc_type, document, id):
     """ Index a document. """
     try:
-        result = elastic_object.index(index=index, doc_type=doc_type, body=document)
+        result = elastic_object.index(index=index, doc_type=doc_type, body=document, id=id)
     except Exception as e:
         print(f'Failed to index document: {e}')
 

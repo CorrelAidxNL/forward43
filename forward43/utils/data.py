@@ -2,15 +2,6 @@ import os
 import json
 
 
-def get_doc_id(document, source):
-    '''
-    For a given document from source dataset, generate a document id
-    @document : Doument object. There should be a project id associated with each document
-    @source   : Source dataset
-    '''
-    return source + '_' + document['id']
-
-
 def create_bulk_actions(index, data, source):
     '''
     Creates bulk actions from a list of json data
@@ -24,7 +15,7 @@ def create_bulk_actions(index, data, source):
 
         yield {
             '_index'  : index,
-            '_id'     : _id,
+            '_id'     : doc['id'],
             '_source' : doc
         }
 

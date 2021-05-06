@@ -40,7 +40,7 @@ class UluleScraper(ForwardScraper):
                     title       = response[k]
 
         details     = {
-            'id'              : response.get('id',             'n.a.'),
+            'id'              : self.which_scraper + '_' + response.get('id', 'n.a.'),
             'title'           : title,
             'description'     : description,
             'status'          : response.get('status',         'n.a.'),
