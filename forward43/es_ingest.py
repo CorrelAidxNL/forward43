@@ -26,7 +26,7 @@ def load_to_es(filepath, es_object):
 if __name__ == '__main__':
 
     # Get ES instance
-    es = es_utils.connect_elasticsearch()
+    es_object = es_utils.connect_elasticsearch()
 
     # Populate ES with data
     for filepath in os.listdir(DATA_DIRECTORY):
