@@ -41,7 +41,7 @@ class StartSomeGoodScraper(ForwardScraper):
                 city = country = contact = subtitle.text.strip()  # Fallback scenario
 
             project_list.append({
-                'id'              : project.get('href')[1:],
+                'id'              : self.which_scraper + '_' + project.get('href')[1:],
                 'title'           : project.find('h4').text,
                 'description'     : story.text if story is not None else 'n.a.',
                 'status'          : project.find('span', class_='pull-right closing-date').text,

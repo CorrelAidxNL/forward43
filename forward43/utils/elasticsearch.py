@@ -1,29 +1,19 @@
-# -*- coding: utf-8 -*-
-"""
-This module sets up a connection to Elasticsearch and enables interaction.
-
-Created on Tue Dec 29 16:39:25 2020
-@author: Marijke Thijssen
-"""
-# %%   Import packages
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, helpers
 import json
 
 
-# %%   Functions
 def connect_elasticsearch(host='localhost', port=9200):
     """ Connect to Elasticsearch host. """
-    es = Elasticsearch([{'host': host, 
-                         'port': port}])
+    es = Elasticsearch([{'host': host, 'port': port}])
     if not es.ping():
         raise ConnectionError(f'Failed to connect to {es}!')
     else:
         print(f'Connected to {es}')
-    
+
     return es
 
 
-def create_index(es_object, index_name, mapping=None, n_shards=1, n_replicas=0):
+def create_index(es_object, index_name, mappings=None, n_shards=1, n_replicas=0):
     """ Create an index if it does not exists yet. """
     is_created = False
 
@@ -31,10 +21,10 @@ def create_index(es_object, index_name, mapping=None, n_shards=1, n_replicas=0):
         'settings': {
             'number_of_shards': n_shards,
             'number_of_replicas': n_replicas
-            },
-        'mappings': mapping
+        },
+        'mappings': mappings
     }
-    
+
     try:
         if not es_object.indices.exists(index_name):
             es_object.indices.create(index=index_name, ignore=400, body=settings)  # Ignore 400 "Index Already Exist" error
@@ -44,15 +34,15 @@ def create_index(es_object, index_name, mapping=None, n_shards=1, n_replicas=0):
         print(f'Failed to create index: {e}')
     finally:
         return is_created
-    
 
-def index_document(elastic_object, index, doc_type, document):
+
+def index_document(elastic_object, index, doc_type, document, id):
     """ Index a document. """
     try:
-        result = elastic_object.index(index=index, doc_type=doc_type, body=document)
+        result = elastic_object.index(index=index, doc_type=doc_type, body=document, id=id)
     except Exception as e:
         print(f'Failed to index document: {e}')
-        
+
     return result
 
 
@@ -60,17 +50,22 @@ def search(es_object, index, search_params):
     """ Search the Elasticsearch index. """
     json_search = json.dumps(search_params)
     result = es_object.search(index=index, body=json_search)
-    
-    return result
-    # Possibilities for search operators include: match, bool (must, should, 
-    # must_not), filter, match_phrase
 
+    return result
 
 
 def get_document(es_object, index, doc_type, es_id):
     """ Get a document. """
     result = es_object.get(index=index, doc_type=doc_type, id=es_id)
-    
+
     return result
 
-# Also possible: bulk, count, create, put_script, update, and more
+
+def bulk_ingest(es_object, actions, **kwargs):
+    """ Bulk ingest """
+    try:
+        response = helpers.bulk(es_object, actions, **kwargs)
+    except Exception as e:
+        print(f'Failed to complete a bulk action: {e}')
+
+    return response
