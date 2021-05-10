@@ -1,0 +1,54 @@
+# This workflow builds the Docker image and pushes it to the directory.
+
+name: Build and Push to GCR
+
+on:
+  release:
+    types: [published, created, edited]
+
+# Environment variables available to all jobs and steps in this workflow
+#  GKE_EMAIL: ${{ secrets.GKE_EMAIL }}
+#  GKE_KEY: ${{ secrets.GKE_KEY }}
+env:
+  GITHUB_SHA: ${{ github.sha }}
+  GITHUB_REF: ${{ github.ref }}
+  IMAGE: forward43
+  REGISTRY_HOSTNAME: gcr.io
+
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build and Publish
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Check out repo
+      uses: actions/checkout@v2
+
+    # Setup gcloud CLI
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        version: '270.0.0'
+        service_account_key: ${{ secrets.GCP_KEY }}
+
+    # Configure docker to use the gcloud command-line tool as a credential helper
+    - run: |
+        gcloud auth configure-docker
+
+    # Build the Docker image
+    - name: Build
+      run: |
+        export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
+        echo $TAG
+        docker build -t "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG" \
+          --build-arg GITHUB_SHA="$GITHUB_SHA" \
+          --build-arg GITHUB_REF="$GITHUB_REF" .
+
+    # Push the Docker image to Google Container Registry
+    - name: Publish
+      run: |
+        export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
+        echo $TAG
+        docker push "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG"
+        docker tag "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG" "$REGISTRY_HOSTNAME"/"$IMAGE":latest
+        docker push "$REGISTRY_HOSTNAME"/"$IMAGE":latest
