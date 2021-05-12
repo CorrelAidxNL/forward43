@@ -1,6 +1,8 @@
 import random
 
 from scraper import ForwardScraper
+from hparams import keywords
+
 
 
 class KickstarterScraper(ForwardScraper):
@@ -14,15 +16,25 @@ class KickstarterScraper(ForwardScraper):
         self.category_ids       = category_ids
         self.num_pages          = num_pages
 
+
     def get_url(self, category, page):
         '''
         Generates a URL to scrape from. It's necessary that category and page parameters are not None
         @category : category id
         @page     : page number
         '''
-        random_seed = 'seed=' + str(random.randint(1, 65536))
-        get_params  = self.default_url_params + [f"category_id={category}", f"page={page}", random_seed]
-        return self.base_url + '&'.join(get_params)
+        
+        ## I inserted a for loop over the keywords to create a list of urls to scrape below that include the search terms we want to use
+        url_term_list = []
+        
+        for term in keywords:
+            search_term = 'term=' + term.replace(' ', '+')
+            random_seed = 'seed=' + str(random.randint(1, 65536))
+            get_params  = self.default_url_params + [f"category_id={category}", f"page={page}", random_seed, search_term]   # added a keyword parameter to the url
+            url         = self.base_url + '&'.join(get_params)
+            url_term_list.append(url)
+            
+        return url_term_list
 
     def process_response(self, response):
 
@@ -53,16 +65,22 @@ class KickstarterScraper(ForwardScraper):
             for page in range(1, self.num_pages + 1):
                 self.logger.info(f'Processing category: {category} and page: {page}')
 
+                # Now, instead of trying a single url, it tries to loop over the list created above
                 try:
-                    url       = self.get_url(category, page)
-                    response  = self.get_response(url)
-                    projects  = self.process_response(response)
-
+                    url_term_list       = self.get_url(category, page)
+                    
+                    print(url_term_list)
+                    
+                    for url in url_term_list:
+                        response  = self.get_response(url)
+                        projects  = self.process_response(response)
+                    return projects
+                    
                 except Exception as e:
                     self.logger.exception('Failed to get projects from current page')
 
             self.write_to_file(projects, str(category))
-
+            
 
 if __name__ == '__main__':
 
