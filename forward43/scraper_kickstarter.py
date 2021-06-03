@@ -66,5 +66,5 @@ class KickstarterScraper(ForwardScraper):
 
 if __name__ == '__main__':
 
-    scraper = KickstarterScraper(category_ids=[3, 272, 1], num_pages=5)
+    scraper = KickstarterScraper(category_ids=[325, 49, 50, 239], num_pages=15)
     scraper.scrape()
