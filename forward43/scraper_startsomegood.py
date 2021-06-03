@@ -32,6 +32,7 @@ class StartSomeGoodScraper(ForwardScraper):
             story          = project_parsed.find('p',  class_='story')
             category       = project_parsed.find('ul', class_="nav nav-pills categories")
             subtitle       = project_parsed.find("p",  class_="sub-title")
+            status         = project.find('span', class_='pull-right closing-date')
 
             if subtitle.contents is not None and len(subtitle.contents) > 2:
                 city    = subtitle.contents[2].split(',')[0].strip()
@@ -40,11 +41,16 @@ class StartSomeGoodScraper(ForwardScraper):
             else: 
                 city = country = contact = subtitle.text.strip()  # Fallback scenario
 
+            if status is not None:
+                status = project.find('span', class_='pull-right closing-date').text
+            else:
+                status = 'UNKNOWN'
+
             project_list.append({
-                'id'              : self.which_scraper + '_' + project.get('href')[1:],
+                'id'              : project.get('href')[1:],
                 'title'           : project.find('h4').text,
                 'description'     : story.text if story is not None else 'n.a.',
-                'status'          : project.find('span', class_='pull-right closing-date').text,
+                'status'          : status,
                 'innovation_type' : category.text if category is not None else 'n.a.',
                 'country'         : country,
                 'city'            : city,

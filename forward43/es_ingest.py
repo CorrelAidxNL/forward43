@@ -32,5 +32,6 @@ if __name__ == '__main__':
     for filepath in os.listdir(DATA_DIRECTORY):
         if not filepath.endswith('.json'):
             continue
-        
-        load_to_es(filepath, es_object)
+
+        print(f'file: {filepath}')
+        load_to_es(os.path.join(DATA_DIRECTORY, filepath), es_object)
