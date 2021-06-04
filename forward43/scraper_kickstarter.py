@@ -32,7 +32,7 @@ class KickstarterScraper(ForwardScraper):
 
         for i in range(num_projects):
             project_list.append({
-                'id'              : self.which_scraper + '_' + data['projects'][i].get('id', 'n.a.'),
+                'id'              : self.which_scraper + '_' + str(data['projects'][i].get('id', 'n.a.')),
                 'title'           : data['projects'][i].get('name', 'n.a.'),
                 'description'     : data['projects'][i].get('blurb', 'n.a.'),
                 'status'          : data['projects'][i].get('state', 'n.a.'),
