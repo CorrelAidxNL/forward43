@@ -56,4 +56,22 @@ class MasterpeaceScraper(ForwardScraper):
 
         return returnable_responses
 
-        return returnable_surveys
+    def get_survey_questions(self, survey_id: str) -> Dict[str, str]:
+        """Get the questions associated with the row number in a survey."""
+        pass
+        self.client.get_survey_page_questions(survey_id)
+
+    def get_survey_choices(self, details: dict) -> Dict[str, str]:
+        """Get closed answer choices to questions."""
+        choices = {}
+        for page in details["pages"]:
+            for question in page.get("questions", []):
+                if question["family"] == "multiple_choice" or question["family"] == "single_choice":
+                    for choice in question.get("answers", {}).get("choices", []):
+                        choices[choice["id"]] = choice["text"]
+        return choices
+
+    def get_survey_details(self, survey_id: str) -> Dict[str, str]:
+        """Get survey details."""
+        details = self.client.get_survey_details(survey_id)
+        return details
