@@ -1,4 +1,4 @@
-import utils.elasticsearch as es_utils
+import forward43.utils.elasticsearch as es_utils
 
 
 if __name__ == '__main__':

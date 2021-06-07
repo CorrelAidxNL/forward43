@@ -1,9 +1,9 @@
 import json
 import os
 
-from data.data_path import DATA_DIRECTORY
+from forward43.data.data_path import DATA_DIRECTORY
 
-import utils.elasticsearch as es_utils
+import forward43.utils.elasticsearch as es_utils
 
 
 def load_to_es(filepath, es_object): 
