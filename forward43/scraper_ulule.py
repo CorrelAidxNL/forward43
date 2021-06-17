@@ -1,7 +1,7 @@
 import math
 import requests
 
-from scraper import ForwardScraper
+from forward43.scraper import ForwardScraper
 
 
 class UluleScraper(ForwardScraper):

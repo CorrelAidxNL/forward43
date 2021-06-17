@@ -1,6 +1,6 @@
 from bs4     import BeautifulSoup
 
-from scraper import ForwardScraper
+from forward43.scraper import ForwardScraper
 
 
 class StartSomeGoodScraper(ForwardScraper):
@@ -37,7 +37,7 @@ class StartSomeGoodScraper(ForwardScraper):
                 city    = subtitle.contents[2].split(',')[0].strip()
                 country = subtitle.contents[2].split(',')[-1].strip()
                 contact = subtitle.contents[-1].strip()
-            else: 
+            else:
                 city = country = contact = subtitle.text.strip()  # Fallback scenario
 
             project_list.append({

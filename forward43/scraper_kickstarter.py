@@ -1,6 +1,6 @@
 import random
 
-from scraper import ForwardScraper
+from forward43.scraper import ForwardScraper
 
 
 class KickstarterScraper(ForwardScraper):
