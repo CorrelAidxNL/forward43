@@ -20,11 +20,20 @@ if __name__ == '__main__':
         }
     }
 
-    # Create index 
+    # Create index projects
     is_created = es_utils.create_index(
-        es_object  = es_object, 
-        index_name = 'forward43', 
-        mappings   = mappings,
+        es_object  = es_object,
+        index_name = 'forward43',
+        mappings   = es_utils.get_mappings("project_scrapes"),
+        n_shards   = 1,
+        n_replicas = 0
+    )
+
+    # Create index linkedin
+    is_created = es_utils.create_index(
+        es_object  = es_object,
+        index_name = 'forward43_companies',
+        mappings   = es_utils.get_mappings("linkedin"),
         n_shards   = 1,
         n_replicas = 0
     )
