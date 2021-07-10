@@ -11,3 +11,4 @@ Click==7.0
 pytest==6.2.2
 Flask==1.1.2
 elasticsearch==7.13.3
+typing_extensions>=3.7.4
