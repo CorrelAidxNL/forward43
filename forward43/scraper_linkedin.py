@@ -13,7 +13,7 @@ from selenium import webdriver
 import time
 
 from forward43 import forward43
-from forward.scraper import ForwardScraper
+from forward43.scraper import ForwardScraper
 
 
 class LinkedInScraper(ForwardScraper):
