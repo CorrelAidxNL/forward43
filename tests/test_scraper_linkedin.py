@@ -27,6 +27,8 @@ class TestLinkedInScraper(unittest.TestCase):
     
     
     def test_FindLoginFields(self):
+        self.browser = webdriver.Chrome(executable_path='data\\chromedriver_win32\\chromedriver.exe')
+        self.browser.get('https://www.linkedin.com/uas/login')
         try:
             self.browser.find_element_by_id('username')
             self.browser.find_element_by_id('password')
