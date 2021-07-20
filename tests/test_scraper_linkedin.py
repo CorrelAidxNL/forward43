@@ -7,6 +7,7 @@ Created on Sun May 30 20:30:20 2021
 """
 # %%   Import packages and settings
 import unittest
+unittest.TestLoader.sortTestMethodsUsing = None
 from selenium import webdriver
 
 from forward43 import forward43
