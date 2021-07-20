@@ -14,7 +14,7 @@ requirements = ['Click>=7.0', ]
 
 setup_requirements = [ ]
 
-test_requirements = [ ]
+test_requirements = ['selenium>=3']
 
 setup(
     author="MasterPeace",
