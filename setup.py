@@ -14,7 +14,7 @@ requirements = ['Click>=7.0', ]
 
 setup_requirements = [ ]
 
-test_requirements = [ ]
+test_requirements = ['selenium>=3', 'beautifulsoup4>=4', 'free-proxy>=1.0']
 
 setup(
     author="MasterPeace",
