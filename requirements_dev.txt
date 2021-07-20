@@ -14,3 +14,4 @@ selenium==3.141.0
 beautifulsoup4==4.9.3
 numpy==1.19.2
 pandas==1.1.5
+free-proxy==1.0.2
