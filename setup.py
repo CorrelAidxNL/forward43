@@ -14,7 +14,7 @@ requirements = ['Click>=7.0', ]
 
 setup_requirements = [ ]
 
-test_requirements = ['selenium>=3']
+test_requirements = ['selenium>=3', 'beautifulsoup4>=4']
 
 setup(
     author="MasterPeace",

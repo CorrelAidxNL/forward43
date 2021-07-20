@@ -11,3 +11,4 @@ Click==7.0
 pytest==6.2.2
 Flask==1.1.2
 selenium==3.141.0
+beautifulsoup4=4.9.3
