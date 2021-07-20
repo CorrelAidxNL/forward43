@@ -9,6 +9,7 @@ Created on Sun May 30 20:30:20 2021
 import unittest
 from selenium import webdriver
 
+from forward43 import forward43
 from forward43 import scraper_linkedin
   
 

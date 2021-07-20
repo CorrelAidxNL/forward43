@@ -12,7 +12,8 @@ import random
 from selenium import webdriver
 import time
 
-from scraper import ForwardScraper
+from forward43 import forward43
+from forward.scraper import ForwardScraper
 
 
 class LinkedInScraper(ForwardScraper):
