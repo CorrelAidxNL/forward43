@@ -2,6 +2,7 @@ import json
 import os
 
 from forward43.data.data_path import DATA_DIRECTORY
+from forward43.logger import logger
 
 import forward43.utils.elasticsearch as es_utils
 
@@ -20,7 +21,7 @@ def load_to_es(filepath, es_object):
             es_utils.index_document(es_object, 'forward43', '_doc', document, document['id'])
 
     except Exception as e:
-        print(f'Error while reading {filepath}. Message: {e}')
+        logger.exception(f'Error while reading {filepath}. Message: {e}')
 
 
 if __name__ == '__main__':
@@ -33,5 +34,5 @@ if __name__ == '__main__':
         if not filepath.endswith('.json'):
             continue
 
-        print(f'file: {filepath}')
+        logger.info(f'file: {filepath}')
         load_to_es(os.path.join(DATA_DIRECTORY, filepath), es_object)

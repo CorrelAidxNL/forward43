@@ -38,7 +38,6 @@ class UluleScraper(ForwardScraper):
                     title       = response[k]
                     which_lang  = k.split('_')[-1]
                     break
-        # description = response.get(f'description_{which_lang}', '')
         description = response.get('description_en', '')
 
         for k, v in response.items():
