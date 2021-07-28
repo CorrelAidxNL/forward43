@@ -1,0 +1,11 @@
+{
+    "properties": {
+        "title"           : { "type" : "text" },
+        "description"     : { "type" : "text" },
+        "status"          : { "type" : "text" },
+        "innovation_type" : { "type" : "text" },
+        "country"         : { "type" : "text" },
+        "contact"         : { "type" : "text" },
+        "link"            : { "type" : "text" }
+    }
+}
