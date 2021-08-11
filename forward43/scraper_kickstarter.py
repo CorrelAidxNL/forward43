@@ -4,37 +4,26 @@ from scraper import ForwardScraper
 from hparams import keywords
 
 
-
 class KickstarterScraper(ForwardScraper):
 
-    def __init__(self, category_ids, num_pages):
+    def __init__(self, num_pages):
         ForwardScraper.__init__(self, 'kickstarter')
 
         self.base_url           = 'https://www.kickstarter.com/discover/advanced.json?'
         self.default_url_params = ['sort=newest', 'woe_id=1']
-
-        self.category_ids       = category_ids
         self.num_pages          = num_pages
+        self.keywords           = keywords
 
-
-    def get_url(self, category, page):
+    def get_search_term_url(self, keyword, page):
         '''
-        Generates a URL to scrape from. It's necessary that category and page parameters are not None
-        @category : category id
+        Generates an URL to scrape from based on a keyword and a page number.
+        It's necessary that page parameter is not None
         @page     : page number
         '''
-        
-        ## I inserted a for loop over the keywords to create a list of urls to scrape below that include the search terms we want to use
-        url_term_list = []
-        
-        for term in keywords:
-            search_term = 'term=' + term.replace(' ', '+')
-            random_seed = 'seed=' + str(random.randint(1, 65536))
-            get_params  = self.default_url_params + [f"category_id={category}", f"page={page}", random_seed, search_term]   # added a keyword parameter to the url
-            url         = self.base_url + '&'.join(get_params)
-            url_term_list.append(url)
-            
-        return url_term_list
+        search_term = 'term=' + keyword.replace(' ', '+')
+        random_seed = 'seed=' + str(random.randint(1, 65536))
+        get_params = self.default_url_params + [random_seed, search_term, f"page={page}"]
+        return self.base_url + '&'.join(get_params)
 
     def process_response(self, response):
 
@@ -59,30 +48,24 @@ class KickstarterScraper(ForwardScraper):
 
     def scrape(self):
         ''' Main Scraper function '''
-        for category in self.category_ids:
+        for keyword in keywords:
             projects = []
 
             for page in range(1, self.num_pages + 1):
-                self.logger.info(f'Processing category: {category} and page: {page}')
+            self.logger.info(f'Processing search: {keyword} and page: {page}')
 
-                # Now, instead of trying a single url, it tries to loop over the list created above
-                try:
-                    url_term_list       = self.get_url(category, page)
-                    
-                    print(url_term_list)
-                    
-                    for url in url_term_list:
-                        response  = self.get_response(url)
-                        projects  = self.process_response(response)
-                    return projects
-                    
-                except Exception as e:
-                    self.logger.exception('Failed to get projects from current page')
+            try:
+                url         = self.get_search_term_url(keyword, page)
+                response    = self.get_response(url)
+                projects    = self.process_response(response)
 
-            self.write_to_file(projects, str(category))
-            
+            except Exception as e:
+                self.logger.exception('Failed to get projects from current page')
+
+        self.write_to_file(projects, str(keyword))
+
 
 if __name__ == '__main__':
 
-    scraper = KickstarterScraper(category_ids=[3, 272, 1], num_pages=5)
+    scraper = KickstarterScraper(keywords=keywords, num_pages=5)
     scraper.scrape()
