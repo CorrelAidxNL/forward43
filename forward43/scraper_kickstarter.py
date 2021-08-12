@@ -6,13 +6,14 @@ from hparams import keywords
 
 class KickstarterScraper(ForwardScraper):
 
-    def __init__(self, num_pages):
+    def __init__(self, keywords, num_pages):
         ForwardScraper.__init__(self, 'kickstarter')
 
         self.base_url           = 'https://www.kickstarter.com/discover/advanced.json?'
         self.default_url_params = ['sort=newest', 'woe_id=1']
-        self.num_pages          = num_pages
+
         self.keywords           = keywords
+        self.num_pages          = num_pages
 
     def get_search_term_url(self, keyword, page):
         '''
@@ -52,17 +53,17 @@ class KickstarterScraper(ForwardScraper):
             projects = []
 
             for page in range(1, self.num_pages + 1):
-            self.logger.info(f'Processing search: {keyword} and page: {page}')
+                self.logger.info(f'Processing search: {keyword} and page: {page}')
 
-            try:
-                url         = self.get_search_term_url(keyword, page)
-                response    = self.get_response(url)
-                projects    = self.process_response(response)
+                try:
+                    url         = self.get_search_term_url(keyword, page)
+                    response    = self.get_response(url)
+                    projects    = self.process_response(response)
 
-            except Exception as e:
-                self.logger.exception('Failed to get projects from current page')
+                except Exception as e:
+                    self.logger.exception('Failed to get projects from current page')
 
-        self.write_to_file(projects, str(keyword))
+            self.write_to_file(projects, str(keyword))
 
 
 if __name__ == '__main__':
