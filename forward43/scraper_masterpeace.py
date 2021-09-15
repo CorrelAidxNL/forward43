@@ -5,6 +5,8 @@ from surveymonkey import client
 from forward43.scraper import ForwardScraper
 
 
+
+
 def get_client(token):
     """Get surveymonkey client."""
     surveymonkey_client = client.Client(access_token=token)
@@ -18,10 +20,6 @@ class MasterpeaceScraper(ForwardScraper):
         ForwardScraper.__init__(self, 'masterpeace')
 
         self.client = get_client(token)
-
-    def scrape(self):
-        """Scrape surveys."""
-        pass
 
     def get_survey_responses(self, search_string: str) -> List[Dict]:
         """Get the correct surveys for Masterpeace projects."""
@@ -85,7 +83,7 @@ class MasterpeaceScraper(ForwardScraper):
                 respondent_ids.append(id)
         return respondent_ids
 
-    def get_questions_dict(survey_details):
+    def get_questions_dict(self, survey_details):
         questions = {}
         for page in survey_details['pages']:
             for question in page.get('questions', []):
@@ -173,6 +171,57 @@ class MasterpeaceScraper(ForwardScraper):
                                 innovation_type_dict.setdefault(key, [])
                                 innovation_type_dict[key].append(value)
         return innovation_type_dict
+
+    def process_response(self, respondent_ids, city_dict, country_dict, link_dict, titles_dict, description_dict, innovation_type_dict):
+
+        num_respondents = len(respondent_ids)
+        project_list = []
+
+        for i in range(num_respondents):
+            num_projects_per_respondent = len(titles_dict['respondent_id'])
+            for j in num_projects_per_respondent:
+            project_list.append({
+                'id'              : respondent_ids[i]+ str(j),
+                'title'           : titles_dict[i].get('text', 'n.a.')[j],
+                'description'     : description_dict[i].get('text', 'n.a.')[j],
+                'status'          : 'n.a.',
+                'innovation_type' : innovation_type_dict[i].get('text', {}).get('name', 'n.a.'),
+                'country'         : data['projects'][i].get('country', 'n.a'),
+                'city'            : data['projects'][i].get('location', {}).get('state', 'n.a.'),
+                'contact'         : data['projects'][i].get('creator', {}).get('name', 'n.a.'),
+                'link'            : data['projects'][i].get('urls', {}).get('web', {}).get('project', 'n.a.')
+            })
+
+        return project_list
+
+    def scrape(self):
+        """main function to scrape MEAL surveys."""
+        for category in self.category_ids:
+            projects = []
+
+            for page in range(1, self.num_pages + 1):
+                self.logger.info(f'Processing category: {category} and page: {page}')
+
+                # Now, instead of trying a single url, it tries to loop over the list created above
+                try:
+                    url_term_list = self.get_url(category, page)
+
+                    print(url_term_list)
+
+                    for url in url_term_list:
+                        response = self.get_response(url)
+                        projects = self.process_response(response)
+                    return projects
+
+                except Exception as e:
+                    self.logger.exception('Failed to get projects from current page')
+
+            self.write_to_file(projects, str(category))
+
+if __name__ == '__main__':
+
+    scraper = MasterpeaceScraper(token)
+    scraper.scrape()
 
 
 
