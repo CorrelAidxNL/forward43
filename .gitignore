@@ -110,3 +110,6 @@ ENV/
 
 # IDE settings
 .vscode/
+
+# random idea
+.idea/

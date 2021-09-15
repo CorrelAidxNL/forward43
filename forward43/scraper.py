@@ -7,8 +7,8 @@ import time
 
 from fp.fp          import FreeProxy
 
-from hparams        import user_agent_list, accept_list
-from data.data_path import DATA_DIRECTORY
+from forward43.hparams        import user_agent_list, accept_list
+from forward43.data.data_path import DATA_DIRECTORY
 
 
 class ForwardScraper:
