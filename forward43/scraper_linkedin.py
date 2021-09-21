@@ -21,13 +21,13 @@ class LinkedInScraper(ForwardScraper):
     def __init__(self):
         ForwardScraper.__init__(self, 'LinkedIn')
         
-        self.driver = 'data\\chromedriver_win32\\chromedriver.exe' # from: https://sites.google.com/chromium.org/driver/
+        self.driver = 'data/chromedriver_linux64/chromedriver.exe' # from: https://sites.google.com/chromium.org/driver/
 
         self.login_page        = 'https://www.linkedin.com/uas/login'
-        self.user              = open('..\\user.txt').readlines()
+        self.user              = open('../user.txt').readlines()  # Replace with other credentials: https://developer.linkedin.com/support/faq
         self.scroll_pause_time = 5
         
-        self.company_file           = 'data\\free_company_dataset_pipe.csv'
+        self.company_file           = 'data/free_company_dataset_pipe.csv'
         self.interesting_industries = ['civic & social organization', 'e-learning', 
                                        'education management', 'environmental services',
                                        'non-profit organization management', 
