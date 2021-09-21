@@ -3,8 +3,9 @@
 name: Build and Push to GCR
 
 on:
-  release:
-    types: [published, created, edited]
+  push:
+    branches:
+      - master
 
 # Environment variables available to all jobs and steps in this workflow
 #  GKE_EMAIL: ${{ secrets.GKE_EMAIL }}
