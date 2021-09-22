@@ -112,4 +112,5 @@ ENV/
 .vscode/
 
 # random idea
+*.idea/
 .idea/
