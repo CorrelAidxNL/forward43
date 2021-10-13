@@ -10,3 +10,5 @@ twine==1.14.0
 Click==7.0
 Flask==1.1.2
 pytest==6.2.2
+free-proxy==1.0.3
+html2text==2020.1.16
