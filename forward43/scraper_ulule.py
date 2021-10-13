@@ -1,5 +1,6 @@
 import math
 import requests
+import html2text
 
 from scraper import ForwardScraper
 
@@ -50,10 +51,10 @@ class UluleScraper(ForwardScraper):
         details     = {
             'id'              : self.which_scraper + '_' + str(response.get('id', 'n.a.')),
             'title'           : title,
-            'description'     : description,
-            'status'          : response.get('status',         'n.a.'),
-            'innovation_type' : response.get('type',           'n.a.'),
-            'country'         : response.get('country',        'n.a.'),
+            'description'     : html2text.html2text(description),
+            'status'          : response.get('status',  'n.a.'),
+            'innovation_type' : response.get('type',    'n.a.'),
+            'country'         : response.get('country', 'n.a.'),
             'city'            : response.get('owner', {}).get('location', 'n.a.'),
             'contact'         : response.get('owner', {}).get('name',     'n.a.'),
             'link'            : response.get('absolute_url',   'n.a.'),
