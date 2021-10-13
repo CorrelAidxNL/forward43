@@ -1,0 +1,15 @@
+{
+    "properties": {
+        "company_name"    : { "type" : "text" },
+        "description"     : { "type" : "text" },
+        "status"          : { "type" : "text" },
+        "innovation_type" : { "type" : "text" },
+        "country"         : { "type" : "text" },
+        "contact"         : { "type" : "text" },
+        "year_founded"    : { "type":  "integer" },
+        "industry"        : { "type":  "keyword" },
+        "num_people"      : { "type":  "integer" },
+        "linkedin_link"   : { "type" : "keyword" },
+        "website_link"    : { "type" : "keyword" }
+    }
+}

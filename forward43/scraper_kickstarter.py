@@ -1,27 +1,28 @@
 import random
 
 from forward43.scraper import ForwardScraper
-
+from hparams import keywords
 
 class KickstarterScraper(ForwardScraper):
 
-    def __init__(self, category_ids, num_pages):
+    def __init__(self, keywords, num_pages):
         ForwardScraper.__init__(self, 'kickstarter')
 
         self.base_url           = 'https://www.kickstarter.com/discover/advanced.json?'
         self.default_url_params = ['sort=newest', 'woe_id=1']
 
-        self.category_ids       = category_ids
+        self.keywords           = keywords
         self.num_pages          = num_pages
 
-    def get_url(self, category, page):
+    def get_search_term_url(self, keyword, page):
         '''
-        Generates a URL to scrape from. It's necessary that category and page parameters are not None
-        @category : category id
+        Generates an URL to scrape from based on a keyword and a page number.
+        It's necessary that page parameter is not None
         @page     : page number
         '''
+        search_term = 'term=' + keyword.replace(' ', '+')
         random_seed = 'seed=' + str(random.randint(1, 65536))
-        get_params  = self.default_url_params + [f"category_id={category}", f"page={page}", random_seed]
+        get_params = self.default_url_params + [random_seed, search_term, f"page={page}"]
         return self.base_url + '&'.join(get_params)
 
     def process_response(self, response):
@@ -47,24 +48,24 @@ class KickstarterScraper(ForwardScraper):
 
     def scrape(self):
         ''' Main Scraper function '''
-        for category in self.category_ids:
+        for keyword in keywords:
             projects = []
 
             for page in range(1, self.num_pages + 1):
-                self.logger.info(f'Processing category: {category} and page: {page}')
+                self.logger.info(f'Processing search: {keyword} and page: {page}')
 
                 try:
-                    url       = self.get_url(category, page)
+                    url       = self.get_search_term_url(keyword, page)
                     response  = self.get_response(url)
                     projects  = self.process_response(response)
 
                 except Exception as e:
                     self.logger.exception('Failed to get projects from current page')
 
-            self.write_to_file(projects, str(category))
+            self.write_to_file(projects, str(keyword))
 
 
 if __name__ == '__main__':
 
-    scraper = KickstarterScraper(category_ids=[325, 49, 50, 239], num_pages=15)
+    scraper = KickstarterScraper(keywords=keywords, num_pages=5)
     scraper.scrape()

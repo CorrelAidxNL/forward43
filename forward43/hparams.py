@@ -32,3 +32,9 @@ accept_list = [
     'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
     'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
 ]
+
+keywords = [
+    "social project", "NGO", "social enterprise", "community", "change", "politics", "environment", "inequality", "justice",
+    "fairness", "sustainability", "future", "talent", "civic organization", "social organization","e-learning","education management", "environmental services",
+    "non-profit organization management","professional training & coaching","think tanks", "renewables & environment"
+]

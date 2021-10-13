@@ -1,5 +1,8 @@
+from typing_extensions import Literal
 from elasticsearch import Elasticsearch, helpers
 import json
+
+from forward43.configurations.configuration_path import CONFIG_DIRECTORY
 
 
 def connect_elasticsearch(host='localhost', port=9200):
@@ -69,3 +72,31 @@ def bulk_ingest(es_object, actions, **kwargs):
         print(f'Failed to complete a bulk action: {e}')
 
     return response
+
+
+def get_mappings(index_type: Literal["project_scrapes", "linkedin", "masterpeace_meal"]) -> dict:
+    """Get ES mapping properties based on index type
+
+    Args:
+        index_type: Literal["project_scrapes", "linkedin", "masterpeace_meal"]
+            project_scrapes: scrapes of innovations found online
+            linkedin: linkedin descriptions of companies
+            masterpeace_meal: evaluations from masterpeace clubs' projects
+    Returns:
+        dict: mappings to instantiate an elasticsearch index
+    """
+    if index_type == "masterpeace_meal":
+        raise NotImplementedError
+
+    if index_type == "linkedin":
+        file_name = CONFIG_DIRECTORY+"/linkedin_mapping.json"
+    elif index_type == "project_scrapes":
+        file_name = CONFIG_DIRECTORY+"/project_scrapes_mapping.json"
+    else:
+        raise NotImplementedError
+
+
+    with open(file_name, "r") as f:
+        mapping = json.load(f)
+
+    return mapping
