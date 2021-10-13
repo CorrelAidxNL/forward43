@@ -12,3 +12,5 @@ pytest==6.2.2
 Flask==1.1.2
 elasticsearch==7.13.3
 typing_extensions>=3.7.4
+free-proxy==1.0.3
+html2text==2020.1.16
