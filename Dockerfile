@@ -3,7 +3,7 @@ FROM python:3.8-slim-buster
 EXPOSE 8080
 
 COPY requirements_dev.txt ./requirements.txt
-RUN pip install -r /requirements.txt
+RUN pip install -r ./requirements.txt
 
 WORKDIR /src
 
