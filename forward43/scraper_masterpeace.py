@@ -4,15 +4,11 @@ from typing import Dict, List
 from surveymonkey import client
 from forward43.scraper import ForwardScraper
 
-
-
-
 def get_client(token):
     """Get surveymonkey client."""
     surveymonkey_client = client.Client(access_token=token)
 
     return surveymonkey_client
-
 
 class MasterpeaceScraper(ForwardScraper):
     """Scrapes Masterpeace clubs' reports of projects."""
@@ -39,9 +35,8 @@ class MasterpeaceScraper(ForwardScraper):
                 f"Surveys not found for search string {search_string}, data returned: {surveys}"
             )
 
-        returnable_responses = {}
         for survey_id in scrapable_surveys.keys():
-            returnable_responses[survey_id] = {}
+            responses_dict[survey_id] = {}
             responses = self.client.get_all_pages_response(survey_id)
             for response in responses:
                 if not response.get("data", []):
@@ -49,10 +44,10 @@ class MasterpeaceScraper(ForwardScraper):
                         f"Responses not found for survey_id {survey_id}, data returned: {responses}"
                     )
                 for response_data in response.get("data"):
-                    respondant_id = response_data.get("id", "")
-                    returnable_responses[survey_id][respondant_id] = response_data
+                    respondent_id = response_data.get("id", "")
+                    responses_dict[survey_id][respondent_id] = response_data
 
-        return returnable_responses
+        return responses_dict
 
     def get_survey_questions(self, survey_id: str) -> Dict[str, str]:
         """Get the questions associated with the row number in a survey."""
@@ -91,136 +86,132 @@ class MasterpeaceScraper(ForwardScraper):
                     questions[row['id']] = row['text']
         return questions
 
-
-    def get_city_dict(responses_dict, respondent_ids, survey_id):
-        """get respondent location: city"""
-        city_dict = {}
-        for respondent_id in respondent_ids:
-            for page in responses_dict[survey_id][respondent_id]['pages']:
-                if page['id'] == '146876559':
-                    for question in page.get('questions', []):
-                        for answer in question.get('answers', []):
-                            if 'row_id' in answer:
-                                if answer['row_id'] == '3771417351':
-                                    city_dict[respondent_id] = answer['text']
-        return city_dict
-
-    def get_country_dict(responses_dict, respondent_ids, survey_id):
-        """get respondent location: country"""
-        country_dict = {}
-        for respondent_id in respondent_ids:
-            for page in responses_dict[survey_id][respondent_id]['pages']:
-                if page['id'] == '146876559':
-                    for question in page.get('questions', []):
-                        for answer in question.get('answers', []):
-                            if 'row_id' in answer:
-                                if answer['row_id'] == '3771417354':
-                                    country_dict[respondent_id] = answer['text']
-        return country_dict
-
-    def get_link_dict(responses_dict, respondent_ids, survey_id):
-        """get respondent contact: link"""
-        link_dict = {}
-        for respondent_id in respondent_ids:
-            for page in responses_dict[survey_id][respondent_id]['pages']:
-                if page['id'] == '146876559':
-                    for question in page.get('questions', []):
-                        for answer in question.get('answers', []):
-                            if 'row_id' in answer:
-                                if answer['row_id'] == '3771417370':
-                                    link_dict[respondent_id] = answer['text']
-        return link_dict
-
-    def get_titles_dict(responses_dict, respondent_ids, survey_id):
+    def get_titles_list(self, responses, respondent_id, survey_id, project_data_dict):
         """Get dict with a list of all project titles per respondent id"""
-        titles_dict = {}
-        for respondent_id in respondent_ids:
-            for page in responses_dict[survey_id][respondent_id]['pages']:
+        titles_list = []
+        for page in responses[survey_id][respondent_id]['pages']:
+            for question in page.get('questions', []):
+                if question['id'] in project_data_dict['Project Title']:
+                    for answer in question.get('answers', []):
+                        key = respondent_id
+                        titles_list.setdefault(key, [])
+                        titles_list[key].append(answer['text'])
+        return titles_list
+
+    def get_innovation_type(self, responses, respondent_id, survey_id, project_data_dict, choices_dict):
+        """Get list of related MasterPeace activities and SDGs"""
+        innovation_type_list = []
+        for page in responses[survey_id][respondent_id]['pages']:
+            for question in page.get('questions', []):
+                if question['id'] in [project_data_dict['Related MasterPeace core activity: (possible to tick multiple)'] or project_data_dict['Related SDGs: (possible to tick multiple)']]:
+                    for answer in question.get('answers', []):
+                        if 'choice_id' in answer:
+                            value = choices_dict[answer['choice_id']]
+                            innovation_type_list.append(value)
+        return innovation_type_list
+
+    def get_club_data_ids(self, survey_details: dict) -> Dict[str, str]:
+        """Get ids of the answers to questions on club data."""
+        club_data = {}
+        for page in survey_details["pages"]:
+            for question in page.get("questions", []):
+                if question["family"] == "demographic" or question["family"] == "open_ended":
+                    for row in question.get("answers", {}).get("rows", []):
+                        if 'type' in row:
+                            club_data[row["id"]] = row["type"]
+        return club_data
+
+    def get_project_data_ids(self, survey_details: dict):
+        """Get ids of the answers to questions on projects."""
+        project_data_ids = {}
+        for page in survey_details["pages"]:
+            for question in page.get("questions", []):
+                if 'headings' in question:
+                    if len(question["headings"]) > 0:
+                        project_data_ids[question['id']] = question['headings'][0].get('heading', "")
+        return project_data_ids
+
+    def split_project_dict(self, project_data_ids: dict):
+        """split project_data_ids dict with duplicate values into 1 dict per project (max 4)"""
+        unique_values = list(set(project_data_ids.values()))
+        split_project_dict = {}
+        for x in unique_values:
+            ids_per_value = [key for key, value in project_data_ids.items() if value == x]
+            ids_per_value.sort()
+            if len(ids_per_value) > 1:
+                split_project_dict[x] = ids_per_value
+        return split_project_dict
+
+    def get_respondent_data(self, responses, survey_id, respondent_id, club_data_dict, entity) -> str:
+        """get data entities per respondent"""
+        for page in responses[survey_id][respondent_id]['pages']:
+            if page['id'] == '146876559':
                 for question in page.get('questions', []):
-                    if question['id'] in ['572537437', '572539926', '572540304', '572540360']:
-                        for answer in question.get('answers', []):
-                            key = respondent_id
-                            titles_dict.setdefault(key, [])
-                            titles_dict[key].append(answer['text'])
-        return titles_dict
+                    for answer in question.get('answers', []):
+                        if 'row_id' in answer:
+                            if answer['row_id'] == club_data_dict[entity]:
+                                return answer['text']
 
-    def get_description_dict(responses_dict, respondent_ids, survey_id):
-        """Get dict with a list of all project descriptions per respondent id"""
-        description_dict = {}
-        for respondent_id in respondent_ids:
-            for page in responses_dict[survey_id][respondent_id]['pages']:
-                for question in page.get('questions', []):
-                    if question['id'] in ['572538644', '572539930', '572540308', '572540365']:
-                        for answer in question.get('answers', []):
-                            key = respondent_id
-                            description_dict.setdefault(key, [])
-                            description_dict[key].append(answer['text'])
-        return description_dict
 
-    def get_innovation_type_dict(responses_dict, respondent_ids, survey_id, choices_dict):
-        """Get dict with list of innovation type per respondent id"""
-        innovation_type_dict = {}
-        for respondent_id in respondent_ids:
-            for page in responses_dict[survey_id][respondent_id]['pages']:
-                for question in page.get('questions', []):
-                    if question['id'] in ['572538515', '572539929', '572540307', '572540364']:
-                        for answer in question.get('answers', []):
-                            if 'choice_id' in answer:
-                                key = respondent_id
-                                value = choices_dict[answer['choice_id']]
-                                innovation_type_dict.setdefault(key, [])
-                                innovation_type_dict[key].append(value)
-        return innovation_type_dict
+    def get_project_data(self, responses, survey_id, respondent_id, split_project_data_dict, project_number, entity) -> str:
+        """get data entities per project"""
+        for page in responses[survey_id][respondent_id]['pages']:
+            for question in page.get('questions', []):
+                if question['id'] in split_project_data_dict[entity][project_number]:
+                    for answer in question.get('answers', []):
+                        return answer['text']
 
-    def process_response(self, respondent_ids, city_dict, country_dict, link_dict, titles_dict, description_dict, innovation_type_dict):
+    def process_response(self, responses, survey_details, survey_id, respondent_id):
+        """process survey data per respondent id"""
+        club_data_dict = self.get_club_data_ids(survey_details)
+        project_data_dict = self.get_project_data_ids(survey_details)
+        split_project_data_dict = self.split_project_dict(project_data_dict)
+        choices_dict = self.get_survey_choices(survey_details)
 
-        num_respondents = len(respondent_ids)
+        titles_list = self.get_titles_list(responses, respondent_id, survey_id, project_data_dict)
+        num_projects = len(titles_list)
         project_list = []
 
-        for i in range(num_respondents):
-            num_projects_per_respondent = len(titles_dict['respondent_id'])
-            for j in num_projects_per_respondent:
+        # get club data
+        country = self.get_respondent_data(responses, survey_id, respondent_id, club_data_dict, entity = 'country')
+        city    = self.get_respondent_data(responses, survey_id, respondent_id, club_data_dict, entity = 'city')
+        contact = self.get_respondent_data(responses, survey_id, respondent_id, club_data_dict, entity = 'email')
+
+        for i in range(num_projects):
             project_list.append({
-                'id'              : respondent_ids[i]+ str(j),
-                'title'           : titles_dict[i].get('text', 'n.a.')[j],
-                'description'     : description_dict[i].get('text', 'n.a.')[j],
+                'id'              : 'respondent_id'+ str(i),
+                'title'           : self.get_project_data(responses, survey_id, respondent_id, split_project_data_dict, project_number = i, entity = 'Project Title'),
+                'description'     : self.get_project_data(responses, survey_id, respondent_id, split_project_data_dict, project_number = i, entity = 'Describe your project (at least 300 words)<br><br><em>- Context (What is the dilemma that the project is trying to tackle? Why is it important for this neighbourhood/group of people/the country?</em><br><em>- Activities (What did you do?)</em><br><em>- Results (What did you achieve? What did you create, produce, accomplish? Try to include numbers, if possible).</em><br><em>- Impact (What changed in the community? What did you learn yourself or as a team? Did you meet your own expectations)?</em>'),
                 'status'          : 'n.a.',
-                'innovation_type' : innovation_type_dict[i].get('text', {}).get('name', 'n.a.'),
-                'country'         : data['projects'][i].get('country', 'n.a'),
-                'city'            : data['projects'][i].get('location', {}).get('state', 'n.a.'),
-                'contact'         : data['projects'][i].get('creator', {}).get('name', 'n.a.'),
-                'link'            : data['projects'][i].get('urls', {}).get('web', {}).get('project', 'n.a.')
+                'innovation_type' : self.get_innovation_type(responses, respondent_id, survey_id, project_data_dict, choices_dict),
+                'country'         : country,
+                'city'            : city,
+                'contact'         : contact,
+                'link'            : self.get_project_data(responses, survey_id, respondent_id, split_project_data_dict, project_number = i, entity = 'Which media channels did you use? Can you share links to your social media posts or any\xa0external publications?')
             })
 
         return project_list
 
-    def scrape(self):
-        """main function to scrape MEAL surveys."""
-        for category in self.category_ids:
-            projects = []
+    def scrape(self, search_string, survey_id):
+        ''' Main Scraper function '''
+        responses       = self.get_survey_responses(search_string)
+        survey_details  = self.get_survey_details(survey_id)
+        respondent_ids  = self.get_respondent_ids(responses)
 
-            for page in range(1, self.num_pages + 1):
-                self.logger.info(f'Processing category: {category} and page: {page}')
+        for respondent_id in respondent_ids:
+            self.logger.info(f'Processing survey response from respondent {respondent_id}')
 
-                # Now, instead of trying a single url, it tries to loop over the list created above
-                try:
-                    url_term_list = self.get_url(category, page)
+            try:
+                projects        = self.process_response(responses, survey_details, survey_id, respondent_id)
 
-                    print(url_term_list)
+            except Exception as e:
+                self.logger.exception('Failed to get projects from current page')
 
-                    for url in url_term_list:
-                        response = self.get_response(url)
-                        projects = self.process_response(response)
-                    return projects
-
-                except Exception as e:
-                    self.logger.exception('Failed to get projects from current page')
-
-            self.write_to_file(projects, str(category))
+            self.write_to_file(projects, str(search_string + respondent_id))
 
 if __name__ == '__main__':
 
-    scraper = MasterpeaceScraper(token)
+    scraper = MasterpeaceScraper(search_string = "MEAL", survey_id = '297005313')
     scraper.scrape()
 
 
