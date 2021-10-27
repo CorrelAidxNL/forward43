@@ -36,7 +36,7 @@ class MasterpeaceScraper(ForwardScraper):
             )
 
         for survey_id in scrapable_surveys.keys():
-            responses_dict[survey_id] = {}
+            responses_dict = {}
             responses = self.client.get_all_pages_response(survey_id)
             for response in responses:
                 if not response.get("data", []):
