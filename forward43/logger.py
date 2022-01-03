@@ -8,4 +8,4 @@ logging.basicConfig(
 )
 
 logger  = logging.getLogger('forward43')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
