@@ -30,18 +30,25 @@ class UluleScraper(ForwardScraper):
         response    = response.json()
 
         # Get title and description
-        title       = response.get('name_en',        '')
-        description = response.get('description_en', '')
+        title       = response.get('name_en', '')
+
+        which_lang  = ''
         for k, v in response.items():
-            if k.startswith('description') and description != '':
-                if response[k] != '':
-                    description = response[k]
-            if k.startswith('name') and title != '':
+            if k.startswith('name_'):
                 if response[k] != '':
                     title       = response[k]
+                    which_lang  = k.split('_')[-1]
+                    break
+        description = response.get('description_en', '')
+
+        for k, v in response.items():
+            if k.startswith('description_'):
+                if response[k] != '':
+                    description = response[k]
+                    break
 
         details     = {
-            'id'              : self.which_scraper + '_' + response.get('id', 'n.a.'),
+            'id'              : self.which_scraper + '_' + str(response.get('id', 'n.a.')),
             'title'           : title,
             'description'     : html2text.html2text(description),
             'status'          : response.get('status',  'n.a.'),
@@ -92,7 +99,7 @@ class UluleScraper(ForwardScraper):
             except Exception as e:
                 self.logger.exception(f'Failed to fetch project details for project id: {project_id}')
 
-        self.write_to_file(projects, 'projects')
+        self.write_to_file(project_list, 'projects')
 
 
 if __name__ == '__main__':
