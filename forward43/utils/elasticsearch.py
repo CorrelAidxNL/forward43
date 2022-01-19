@@ -5,9 +5,19 @@ import json
 from forward43.configurations.configuration_path import CONFIG_DIRECTORY
 
 
-def connect_elasticsearch(host='localhost', port=9200):
+def connect_elastic_remote(host, port, user, secret):
+    """ Connect to Elasticsearch remote host. """
+    es = Elasticsearch(
+        [{'host': host, 'port': port}],
+        http_auth = (user, secret)
+        scheme    = "https",
+        port      = 443,
+    )
+
+
+def connect_elasticsearch_localhost(port=9200):
     """ Connect to Elasticsearch host. """
-    es = Elasticsearch([{'host': host, 'port': port}])
+    es = Elasticsearch([{'host': 'localhost', 'port': port}])
     if not es.ping():
         raise ConnectionError(f'Failed to connect to {es}!')
     else:
