@@ -1,8 +1,13 @@
 """Scaper for Masterpeace projects."""
+import logging
 from typing import Dict
+import json
 
 from surveymonkey import client
 from forward43.scraper import ForwardScraper
+from forward43.data.data_path import DATA_DIRECTORY
+
+logger = logging.getLogger()
 
 
 def get_client(token):
@@ -14,9 +19,9 @@ def get_client(token):
 
 class MasterpeaceScraper(ForwardScraper):
     """Scrapes Masterpeace clubs' reports of projects."""
-    def __init__(self, token: str):
-        ForwardScraper.__init__(self, 'masterpeace')
-
+    def __init__(self, token: str, use_local: bool = False):
+        ForwardScraper.__init__(self, "masterpeace")
+        self.use_local = use_local
         self.client = get_client(token)
 
     def scrape(self):
@@ -29,6 +34,10 @@ class MasterpeaceScraper(ForwardScraper):
         Returns:
             Dict[survey_id : Dict of responses]
         """
+        if self.use_local:
+            with open(DATA_DIRECTORY + "/surveys.json") as fh:
+                surveys = json.load(fh)
+            return surveys
         surveys = self.client.get_survey_lists()
         if 'data' not in surveys:
             raise ValueError(
@@ -76,5 +85,9 @@ class MasterpeaceScraper(ForwardScraper):
 
     def get_survey_details(self, survey_id: str) -> Dict[str, str]:
         """Get survey details."""
-        details = self.client.get_survey_details(survey_id)
+        if self.use_local:
+            with open(DATA_DIRECTORY + "/survey_details.json") as fh:
+                details = json.load(fh)
+        else:
+            details = self.client.get_survey_details(survey_id)
         return details
