@@ -21,4 +21,4 @@ RUN apt-get update && \
 
 RUN make install
 
-CMD ["python", "/src/forward43/forward43.py", "-u"]
+CMD ["python", "/src/forward43/forward43.py", "--update_elastic_db", "--host", "os.host", "--port", "os.port", "--user", "os.user", "--secret", "os.secret"]
