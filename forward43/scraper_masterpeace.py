@@ -1,5 +1,5 @@
 """Scaper for Masterpeace projects."""
-from typing import Dict, List
+from typing import Dict
 
 from surveymonkey import client
 from forward43.scraper import ForwardScraper
@@ -23,8 +23,12 @@ class MasterpeaceScraper(ForwardScraper):
         """Scrape surveys."""
         pass
 
-    def get_survey_responses(self, search_string: str) -> List[Dict]:
-        """Get the correct surveys for Masterpeace projects."""
+    def get_survey_responses(self, search_string: str) -> Dict[str, Dict]:
+        """Get surveys for Masterpeace projects that have the search string in their title.
+
+        Returns:
+            Dict[survey_id : Dict of responses]
+        """
         surveys = self.client.get_survey_lists()
         if 'data' not in surveys:
             raise ValueError(
@@ -40,7 +44,6 @@ class MasterpeaceScraper(ForwardScraper):
             raise ValueError(
                 f"Surveys not found for search string {search_string}, data returned: {surveys}"
             )
-
         returnable_responses = {}
         for survey_id in scrapable_surveys.keys():
             returnable_responses[survey_id] = {}
@@ -51,8 +54,8 @@ class MasterpeaceScraper(ForwardScraper):
                         f"Responses not found for survey_id {survey_id}, data returned: {responses}"
                     )
                 for response_data in response.get("data"):
-                    respondant_id = response_data.get("id", "")
-                    returnable_responses[survey_id][respondant_id] = response_data
+                    respondent_id = response_data.get("id", "")
+                    returnable_responses[survey_id][respondent_id] = response_data
 
         return returnable_responses
 
