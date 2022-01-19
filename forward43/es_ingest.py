@@ -2,7 +2,7 @@ import json
 import os
 
 from forward43.data.data_path import DATA_DIRECTORY
-from forward43.logger import logger
+from forward43.logger         import logger
 
 import forward43.utils.elasticsearch as es_utils
 

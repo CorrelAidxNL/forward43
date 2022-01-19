@@ -1,7 +1,7 @@
 import random
 
 from forward43.scraper import ForwardScraper
-from hparams import keywords
+from forward43.hparams import keywords
 
 class KickstarterScraper(ForwardScraper):
 
