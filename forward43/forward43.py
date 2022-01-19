@@ -1,3 +1,10 @@
+# Entry point to the script
+# This function will scrape from the relevant scrapers
+# and update the Elasticsearch database
+# 
+# Example usage: 
+#   `python -m forward43.forward43 --scrapers kickstarter ulule --num_pages 10 --update_elastic_db`
+
 import argparse
 import os
 
