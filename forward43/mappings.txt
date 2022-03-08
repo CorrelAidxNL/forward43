@@ -1,0 +1,10 @@
+title:text
+descripton:text
+status:text
+innovation_type:text
+country:text
+city:keyword
+contact_person.name:text
+contact_person.email:keyword
+contact_person.number:long
+link:keyword
