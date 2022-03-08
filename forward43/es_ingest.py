@@ -20,9 +20,6 @@ def injest_data_to_es(es_host, es_port, es_user, es_secret):
 
     # injest scraped data
     for filepath in os.listdir(DATA_DIRECTORY):
-        if filepath.endswith('.json'):
-            load_to_es(os.path.join(DATA_DIRECTORY, filepath), es_object)
-
         try:
             with open(filepath) as f:
                 data = json.load(f)
