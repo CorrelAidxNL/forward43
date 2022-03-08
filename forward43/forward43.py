@@ -9,7 +9,7 @@ import argparse
 import os
 
 
-def main(scrapers, num_pages, update_elastic_db, host, port):
+def main(scrapers, num_pages, update_elastic_db, host, port, user, secret):
 
     if 'kickstarter' in scrapers:
         from forward43.hparams             import keywords
