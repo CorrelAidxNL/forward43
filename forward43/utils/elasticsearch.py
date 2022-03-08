@@ -10,8 +10,8 @@ def connect_elastic_remote(host, port, user, secret):
     es = Elasticsearch(
         [{'host': host, 'port': port}],
         http_auth = (user, secret)
-        scheme    = "https",
-        port      = 443,
+        scheme = "https",
+        port = 443,
     )
 
 
