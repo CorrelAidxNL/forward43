@@ -30,7 +30,7 @@ def main(scrapers, num_pages, update_elastic_db, host, port):
 
     if update_elastic_db:
         from forward43.es_ingest import injest_data_to_es
-        injes_data_to_es(host=host, port=port, user=user, secret=secret)
+        injest_data_to_es(host=host, port=port, user=user, secret=secret)
 
 
 if __name__ == "__main__":
